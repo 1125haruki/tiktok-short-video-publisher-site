@@ -1,0 +1,7 @@
+name = "tiktok-short-video-publisher-auth"
+main = "src/index.js"
+compatibility_date = "2026-03-12"
+workers_dev = true
+
+[observability]
+enabled = true
