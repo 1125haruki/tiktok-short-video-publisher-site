@@ -180,8 +180,12 @@ async function handleConnect(request, env) {
     state: stateBundle.state,
   });
 
-  // Web app flow can use OAuth v2 without query params on redirect URI.
-  const response = Response.redirect(`${AUTH_URL}?${params.toString()}`, 302);
+  const response = new Response(null, {
+    status: 302,
+    headers: {
+      Location: `${AUTH_URL}?${params.toString()}`,
+    },
+  });
   response.headers.append("Set-Cookie", cookie("tt_state_verifier", stateBundle.verifier, 600));
   return response;
 }
@@ -416,72 +420,79 @@ async function handleStatus(request, env) {
 
 export default {
   async fetch(request, env) {
-    const url = new URL(request.url);
+    try {
+      const url = new URL(request.url);
 
-    if (request.method === "OPTIONS") {
-      return preflight(request, env);
-    }
+      if (request.method === "OPTIONS") {
+        return preflight(request, env);
+      }
 
-    if (url.pathname === "/tiktok/health") {
-      return withCors(
-        request,
-        env,
-        json({
-          ok: true,
-          path: url.pathname,
-          configured: Boolean(
-            env.TIKTOK_CLIENT_KEY &&
-              env.TIKTOK_CLIENT_SECRET &&
-              env.TIKTOK_REDIRECT_URI &&
-              env.STATE_SECRET
-          ),
-          scope: env.TIKTOK_SCOPE || "video.upload",
-        })
+      if (url.pathname === "/tiktok/health") {
+        return withCors(
+          request,
+          env,
+          json({
+            ok: true,
+            path: url.pathname,
+            configured: Boolean(
+              env.TIKTOK_CLIENT_KEY &&
+                env.TIKTOK_CLIENT_SECRET &&
+                env.TIKTOK_REDIRECT_URI &&
+                env.STATE_SECRET
+            ),
+            scope: env.TIKTOK_SCOPE || "video.upload",
+          })
+        );
+      }
+
+      if (
+        !env.TIKTOK_CLIENT_KEY ||
+        !env.TIKTOK_CLIENT_SECRET ||
+        !env.TIKTOK_REDIRECT_URI ||
+        !env.STATE_SECRET
+      ) {
+        return json(
+          {
+            error: "misconfigured_worker",
+            message: "Required environment variables are missing.",
+          },
+          { status: 500 }
+        );
+      }
+
+      if (url.pathname === "/tiktok/connect") {
+        return handleConnect(request, env);
+      }
+
+      if (url.pathname === "/tiktok/callback") {
+        return handleCallback(request, env);
+      }
+
+      if (url.pathname === "/tiktok/session") {
+        return handleSession(request, env);
+      }
+
+      if (url.pathname === "/tiktok/upload-draft" && request.method === "POST") {
+        return handleUploadDraft(request, env);
+      }
+
+      if (url.pathname === "/tiktok/status") {
+        return handleStatus(request, env);
+      }
+
+      return html(
+        `<h1>TikTok OAuth Worker</h1>
+         <p>Use <code>/tiktok/connect</code> to start authorization.</p>
+         <p>Use <code>/tiktok/session</code> to inspect the current connection.</p>
+         <p>Use <code>/tiktok/upload-draft</code> to initialize Upload API draft creation.</p>
+         <p>Use <code>/tiktok/health</code> to verify deployment.</p>`,
+        { status: 200 }
       );
-    }
-
-    if (
-      !env.TIKTOK_CLIENT_KEY ||
-      !env.TIKTOK_CLIENT_SECRET ||
-      !env.TIKTOK_REDIRECT_URI ||
-      !env.STATE_SECRET
-    ) {
-      return json(
-        {
-          error: "misconfigured_worker",
-          message: "Required environment variables are missing.",
-        },
+    } catch (err) {
+      return html(
+        `<h1>Worker exception</h1><p><code>${String(err?.message || err)}</code></p>`,
         { status: 500 }
       );
     }
-
-    if (url.pathname === "/tiktok/connect") {
-      return handleConnect(request, env);
-    }
-
-    if (url.pathname === "/tiktok/callback") {
-      return handleCallback(request, env);
-    }
-
-    if (url.pathname === "/tiktok/session") {
-      return handleSession(request, env);
-    }
-
-    if (url.pathname === "/tiktok/upload-draft" && request.method === "POST") {
-      return handleUploadDraft(request, env);
-    }
-
-    if (url.pathname === "/tiktok/status") {
-      return handleStatus(request, env);
-    }
-
-    return html(
-      `<h1>TikTok OAuth Worker</h1>
-       <p>Use <code>/tiktok/connect</code> to start authorization.</p>
-       <p>Use <code>/tiktok/session</code> to inspect the current connection.</p>
-       <p>Use <code>/tiktok/upload-draft</code> to initialize Upload API draft creation.</p>
-       <p>Use <code>/tiktok/health</code> to verify deployment.</p>`,
-      { status: 200 }
-    );
   },
 };
