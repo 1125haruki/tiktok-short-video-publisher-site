@@ -212,6 +212,20 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
+    if (url.pathname === "/tiktok/health") {
+      return json({
+        ok: true,
+        path: url.pathname,
+        configured: Boolean(
+          env.TIKTOK_CLIENT_KEY &&
+            env.TIKTOK_CLIENT_SECRET &&
+            env.TIKTOK_REDIRECT_URI &&
+            env.STATE_SECRET
+        ),
+        scope: env.TIKTOK_SCOPE || "video.upload",
+      });
+    }
+
     if (
       !env.TIKTOK_CLIENT_KEY ||
       !env.TIKTOK_CLIENT_SECRET ||
@@ -225,14 +239,6 @@ export default {
         },
         { status: 500 }
       );
-    }
-
-    if (url.pathname === "/tiktok/health") {
-      return json({
-        ok: true,
-        path: url.pathname,
-        scope: env.TIKTOK_SCOPE || "video.upload",
-      });
     }
 
     if (url.pathname === "/tiktok/connect") {

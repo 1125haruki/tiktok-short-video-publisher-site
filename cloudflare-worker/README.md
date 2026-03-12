@@ -4,6 +4,9 @@ TikTok OAuth v2 の最小 Worker です。
 
 ## 役割
 
+- `/tiktok/health`
+  - デプロイ確認
+  - secrets 未設定でも疎通確認できる
 - `/tiktok/connect`
   - TikTok 認可画面へリダイレクト
 - `/tiktok/callback`
@@ -38,3 +41,4 @@ TikTok OAuth v2 の最小 Worker です。
 - 最初は `TIKTOK_SCOPE=video.upload`
 - `TOKEN_SINK_URL` が未設定でも接続確認はできます
 - 本番では token の保存先を必ず決めてください
+- 現在の Worker URL は `https://tiktok-short-video-publisher-auth.chillsabo1125.workers.dev`

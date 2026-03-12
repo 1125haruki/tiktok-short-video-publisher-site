@@ -25,7 +25,9 @@ TikTok Developers 申請用の最小公開セットです。
 - `Terms of Service URL`
   - `https://1125haruki.github.io/tiktok-short-video-publisher-site/terms-of-service.html`
 - `Redirect URI`
-  - `https://<your-worker-subdomain>.workers.dev/tiktok/callback`
+  - `https://tiktok-short-video-publisher-auth.chillsabo1125.workers.dev/tiktok/callback`
+- `Health Check`
+  - `https://tiktok-short-video-publisher-auth.chillsabo1125.workers.dev/tiktok/health`
 
 ## 置換が必要な箇所
 
@@ -34,6 +36,7 @@ TikTok Developers 申請用の最小公開セットです。
 - `https://example.com`
 - Worker 側の `ALLOWED_ORIGIN`
 - Worker 側の `TOKEN_SINK_URL` か保存先
+- Worker 側の `TIKTOK_CLIENT_KEY` / `TIKTOK_CLIENT_SECRET` / `STATE_SECRET`
 
 ## 実務メモ
 
