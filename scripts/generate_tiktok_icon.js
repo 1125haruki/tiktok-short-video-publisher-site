@@ -44,37 +44,8 @@ function roundedRectSdf(x, y, cx, cy, w, h, r) {
   return Math.hypot(qx, qy) + Math.min(Math.max(dx, dy), 0) - r;
 }
 
-function roundedRectLocalSdf(x, y, w, h, r) {
-  const dx = Math.abs(x) - w / 2 + r;
-  const dy = Math.abs(y) - h / 2 + r;
-  const qx = Math.max(dx, 0);
-  const qy = Math.max(dy, 0);
-  return Math.hypot(qx, qy) + Math.min(Math.max(dx, dy), 0) - r;
-}
-
-function roundedRectRotatedSdf(x, y, cx, cy, w, h, r, angle) {
-  const dx = x - cx;
-  const dy = y - cy;
-  const c = Math.cos(angle);
-  const s = Math.sin(angle);
-  const rx = dx * c + dy * s;
-  const ry = -dx * s + dy * c;
-  return roundedRectLocalSdf(rx, ry, w, h, r);
-}
-
 function circleSdf(x, y, cx, cy, r) {
   return Math.hypot(x - cx, y - cy) - r;
-}
-
-function capsuleSdf(x, y, ax, ay, bx, by, r) {
-  const pax = x - ax;
-  const pay = y - ay;
-  const bax = bx - ax;
-  const bay = by - ay;
-  const h = clamp((pax * bax + pay * bay) / (bax * bax + bay * bay), 0, 1);
-  const dx = pax - bax * h;
-  const dy = pay - bay * h;
-  return Math.hypot(dx, dy) - r;
 }
 
 function triangleSdf(px, py, ax, ay, bx, by, cx, cy) {
@@ -130,102 +101,51 @@ function pngChunk(type, data) {
   const lenBuf = Buffer.alloc(4);
   lenBuf.writeUInt32BE(data.length, 0);
   const crcBuf = Buffer.alloc(4);
-  const crc = crc32(Buffer.concat([typeBuf, data]));
-  crcBuf.writeUInt32BE(crc, 0);
+  crcBuf.writeUInt32BE(crc32(Buffer.concat([typeBuf, data])), 0);
   return Buffer.concat([lenBuf, typeBuf, data, crcBuf]);
 }
 
 fs.mkdirSync(outDir, { recursive: true });
 
 const pixels = Buffer.alloc(size * size * 4);
-const topBg = [20, 64, 60, 255];
-const bottomBg = [234, 224, 206, 255];
-const glowCoral = [220, 122, 80, 255];
-const glowMint = [100, 196, 170, 255];
-const dark = [17, 54, 51, 255];
-const deep = [9, 34, 32, 255];
-const mint = [22, 141, 116, 255];
-const ivory = [252, 248, 242, 255];
-const coral = [218, 119, 76, 255];
-const coralSoft = [232, 181, 150, 255];
-const sand = [236, 213, 170, 255];
+const bgTop = [242, 238, 231, 255];
+const bgBottom = [227, 220, 208, 255];
+const shadow = [25, 43, 40, 255];
+const frame = [18, 55, 51, 255];
+const screen = [251, 247, 241, 255];
+const mint = [20, 136, 112, 255];
+const coral = [218, 125, 82, 255];
 const white = [255, 255, 255, 255];
 
 for (let y = 0; y < size; y += 1) {
   for (let x = 0; x < size; x += 1) {
     const idx = (y * size + x) * 4;
-    const tx = x / (size - 1);
-    const ty = y / (size - 1);
-    let color = mix(topBg, bottomBg, tx * 0.62 + ty * 0.38);
+    const t = y / (size - 1);
+    let color = mix(bgTop, bgBottom, t);
 
-    const g1 = clamp(1 - circleSdf(x, y, 180, 160, 310) / 360, 0, 1) * 0.22;
-    const g2 = clamp(1 - circleSdf(x, y, 860, 790, 260) / 340, 0, 1) * 0.17;
-    const g3 = clamp(1 - circleSdf(x, y, 680, 240, 200) / 280, 0, 1) * 0.12;
-    color = over(color, [glowMint[0], glowMint[1], glowMint[2], Math.round(255 * g1)]);
-    color = over(color, [glowCoral[0], glowCoral[1], glowCoral[2], Math.round(255 * g2)]);
-    color = over(color, [255, 255, 255, Math.round(255 * g3)]);
+    const glow = circleSdf(x, y, 512, 472, 260);
+    color = over(color, softFill(glow, 120, [255, 255, 255, 42]));
 
-    const halo = circleSdf(x, y, 536, 504, 286);
-    color = over(color, softFill(halo, 90, [255, 255, 255, 56]));
+    const cardShadow = roundedRectSdf(x, y, 512, 540, 430, 620, 104);
+    color = over(color, softFill(cardShadow - 18, 42, [shadow[0], shadow[1], shadow[2], 52]));
 
-    const backShadow = roundedRectRotatedSdf(x, y, 420, 512, 320, 494, 82, -0.2);
-    color = over(color, softFill(backShadow - 22, 42, [8, 32, 31, 52]));
+    const cardOuter = roundedRectSdf(x, y, 512, 512, 430, 620, 104);
+    color = over(color, softFill(cardOuter, 2.4, frame));
 
-    const frontShadow = roundedRectRotatedSdf(x, y, 596, 548, 346, 522, 90, 0.12);
-    color = over(color, softFill(frontShadow - 20, 46, [9, 28, 28, 56]));
+    const cardInner = roundedRectSdf(x, y, 512, 512, 368, 558, 78);
+    color = over(color, softFill(cardInner, 2.4, screen));
 
-    const backCard = roundedRectRotatedSdf(x, y, 420, 500, 320, 494, 82, -0.2);
-    color = over(color, softFill(backCard, 2.6, dark));
+    const topPill = roundedRectSdf(x, y, 512, 274, 116, 22, 11);
+    color = over(color, softFill(topPill, 2.0, mint));
 
-    const backInner = roundedRectRotatedSdf(x, y, 420, 500, 278, 452, 62, -0.2);
-    color = over(color, softFill(backInner, 2.6, [29, 91, 85, 255]));
+    const playCircleShadow = circleSdf(x, y, 512, 560, 118);
+    color = over(color, softFill(playCircleShadow - 8, 30, [189, 104, 66, 44]));
 
-    const backTopBar = roundedRectRotatedSdf(x, y, 420, 318, 102, 18, 9, -0.2);
-    color = over(color, softFill(backTopBar, 2.0, [208, 245, 232, 255]));
+    const playCircle = circleSdf(x, y, 512, 548, 118);
+    color = over(color, softFill(playCircle, 2.2, coral));
 
-    const backPlayCircle = circleSdf(x, y, 420, 530, 72);
-    color = over(color, softFill(backPlayCircle, 2.4, [240, 249, 246, 220]));
-    const backPlay = triangleSdf(x, y, 396, 490, 396, 570, 468, 530);
-    color = over(color, softFill(backPlay, 2.2, deep));
-
-    const frontCardOuter = roundedRectRotatedSdf(x, y, 596, 536, 346, 522, 90, 0.12);
-    color = over(color, softFill(frontCardOuter, 2.6, deep));
-
-    const frontCard = roundedRectRotatedSdf(x, y, 596, 536, 306, 482, 72, 0.12);
-    color = over(color, softFill(frontCard, 2.4, ivory));
-
-    const frontTopBar = roundedRectRotatedSdf(x, y, 596, 336, 110, 20, 10, 0.12);
-    color = over(color, softFill(frontTopBar, 2.0, mint));
-
-    const frontCircleShadow = circleSdf(x, y, 596, 548, 104);
-    color = over(color, softFill(frontCircleShadow - 10, 34, [204, 116, 78, 56]));
-
-    const frontCircle = circleSdf(x, y, 596, 536, 104);
-    color = over(color, softFill(frontCircle, 2.4, coral));
-
-    const frontPlay = triangleSdf(x, y, 562, 486, 562, 586, 650, 536);
-    color = over(color, softFill(frontPlay, 2.2, white));
-
-    const arrowShadow = capsuleSdf(x, y, 314, 716, 770, 350, 24);
-    color = over(color, softFill(arrowShadow - 12, 28, [14, 43, 40, 68]));
-
-    const arrowStroke = capsuleSdf(x, y, 312, 710, 760, 352, 24);
-    color = over(color, softFill(arrowStroke, 2.2, [247, 235, 219, 255]));
-
-    const arrowBody = capsuleSdf(x, y, 326, 698, 742, 364, 18);
-    color = over(color, softFill(arrowBody, 2.2, sand));
-
-    const arrowHead = triangleSdf(x, y, 704, 300, 824, 324, 748, 428);
-    color = over(color, softFill(arrowHead, 2.4, sand));
-
-    const dot1 = circleSdf(x, y, 792, 248, 20);
-    color = over(color, softFill(dot1, 2.0, coralSoft));
-    const dot2 = circleSdf(x, y, 220, 770, 16);
-    color = over(color, softFill(dot2, 2.0, white));
-    const dot3 = circleSdf(x, y, 764, 742, 14);
-    color = over(color, softFill(dot3, 2.0, mint));
-    const dot4 = circleSdf(x, y, 302, 266, 12);
-    color = over(color, softFill(dot4, 2.0, [255, 255, 255, 150]));
+    const playTriangle = triangleSdf(x, y, 470, 490, 470, 606, 578, 548);
+    color = over(color, softFill(playTriangle, 2.0, white));
 
     pixels[idx] = color[0];
     pixels[idx + 1] = color[1];

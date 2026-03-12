@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>TikTok Upload Demo | Short Video Publisher</title>
+    <style>
+      :root {
+        --bg: #f4efe6;
+        --fg: #1f1b16;
+        --muted: #6f675f;
+        --line: #d8ccbb;
+        --card: rgba(255, 252, 246, 0.92);
+        --accent: #0d7c66;
+        --accent-2: #c47e3c;
+        --danger: #c2410c;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: "Hiragino Sans", "Yu Gothic", sans-serif;
+        color: var(--fg);
+        background:
+          radial-gradient(circle at top left, rgba(13, 124, 102, 0.15), transparent 28%),
+          radial-gradient(circle at bottom right, rgba(196, 126, 60, 0.16), transparent 32%),
+          linear-gradient(180deg, #f7f3ea, #e8dfcf);
+      }
+      main {
+        max-width: 1080px;
+        margin: 0 auto;
+        padding: 42px 18px 72px;
+      }
+      .hero,
+      .card {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 24px;
+        backdrop-filter: blur(8px);
+      }
+      .hero {
+        padding: 28px;
+      }
+      .eyebrow {
+        color: var(--accent);
+        font-size: 13px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+      }
+      h1,
+      h2,
+      h3 {
+        margin: 0;
+      }
+      h1 {
+        font-size: clamp(32px, 5vw, 52px);
+        line-height: 1.02;
+        margin-bottom: 14px;
+      }
+      p {
+        margin: 0;
+        line-height: 1.7;
+      }
+      .muted {
+        color: var(--muted);
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: 1.3fr 1fr;
+        gap: 16px;
+        margin-top: 18px;
+      }
+      .stack {
+        display: grid;
+        gap: 16px;
+      }
+      .card {
+        padding: 22px;
+      }
+      .steps {
+        display: grid;
+        gap: 12px;
+        margin-top: 16px;
+      }
+      .step {
+        display: grid;
+        grid-template-columns: 34px 1fr;
+        gap: 12px;
+        align-items: start;
+      }
+      .step strong {
+        display: block;
+        margin-bottom: 4px;
+      }
+      .badge {
+        width: 34px;
+        height: 34px;
+        border-radius: 999px;
+        display: grid;
+        place-items: center;
+        background: rgba(13, 124, 102, 0.1);
+        color: var(--accent);
+        font-weight: 700;
+      }
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 18px;
+      }
+      button,
+      .button-link {
+        appearance: none;
+        border: none;
+        border-radius: 999px;
+        padding: 13px 18px;
+        font: inherit;
+        cursor: pointer;
+        text-decoration: none;
+      }
+      .button-primary {
+        background: var(--accent);
+        color: #fff;
+      }
+      .button-secondary {
+        background: rgba(13, 124, 102, 0.08);
+        color: var(--accent);
+      }
+      .button-tertiary {
+        background: rgba(196, 126, 60, 0.12);
+        color: #7a4b16;
+      }
+      label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 8px;
+      }
+      input {
+        width: 100%;
+        padding: 12px 14px;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        font: inherit;
+        background: #fffdfa;
+      }
+      code,
+      pre {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      }
+      pre {
+        margin: 0;
+        padding: 16px;
+        border-radius: 16px;
+        background: #181818;
+        color: #f7f7f7;
+        overflow: auto;
+        min-height: 160px;
+      }
+      .status-line {
+        margin-top: 12px;
+        padding: 12px 14px;
+        border-radius: 14px;
+        background: rgba(13, 124, 102, 0.08);
+        color: var(--accent);
+        font-weight: 600;
+      }
+      .status-line.error {
+        background: rgba(194, 65, 12, 0.08);
+        color: var(--danger);
+      }
+      .meta {
+        display: grid;
+        gap: 10px;
+        margin-top: 14px;
+      }
+      .meta-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+      }
+      .pill {
+        display: inline-flex;
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: rgba(13, 124, 102, 0.08);
+        color: var(--accent);
+        font-size: 13px;
+      }
+      video {
+        width: 100%;
+        border-radius: 18px;
+        border: 1px solid var(--line);
+        background: #000;
+      }
+      footer {
+        margin-top: 18px;
+        color: var(--muted);
+        font-size: 14px;
+      }
+      @media (max-width: 840px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section class="hero">
+        <div class="eyebrow">TikTok Review Demo</div>
+        <h1>Connect once, inspect session, then send a draft upload.</h1>
+        <p>
+          This page demonstrates the current TikTok integration for Short Video Publisher.
+          The flow uses Login Kit for account connection and the Content Posting Upload API to
+          send an original short-form video as a draft-ready upload flow.
+        </p>
+        <div class="steps">
+          <div class="step">
+            <div class="badge">1</div>
+            <div>
+              <strong>Connect TikTok</strong>
+              <p class="muted">Start OAuth on the worker domain and authorize the app.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="badge">2</div>
+            <div>
+              <strong>Inspect session</strong>
+              <p class="muted">Fetch the connected account state and basic user profile.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="badge">3</div>
+            <div>
+              <strong>Send upload draft</strong>
+              <p class="muted">Initialize a TikTok Upload API draft from a public MP4 URL.</p>
+            </div>
+          </div>
+        </div>
+        <div class="actions">
+          <a class="button-link button-primary" id="connectButton" href="#">TikTok を接続</a>
+          <button class="button-secondary" id="refreshSessionButton" type="button">接続状態を確認</button>
+          <a class="button-link button-tertiary" href="./index.html">公開トップへ戻る</a>
+        </div>
+      </section>
+
+      <section class="grid">
+        <div class="stack">
+          <article class="card">
+            <h2>Upload Draft</h2>
+            <p class="muted">
+              公開 URL の MP4 を TikTok Upload API に渡します。最終投稿は TikTok 側で確認できます。
+            </p>
+            <div class="meta">
+              <div>
+                <label for="videoUrl">Public MP4 URL</label>
+                <input id="videoUrl" type="url" />
+              </div>
+              <div class="actions">
+                <button class="button-primary" id="uploadDraftButton" type="button">下書き送信</button>
+                <button class="button-secondary" id="checkStatusButton" type="button">publish status 確認</button>
+              </div>
+              <div>
+                <label for="publishId">Publish ID</label>
+                <input id="publishId" type="text" placeholder="upload 後に自動入力されます" />
+              </div>
+            </div>
+            <div class="status-line" id="statusLine">初期状態です。まず TikTok を接続してください。</div>
+          </article>
+
+          <article class="card">
+            <h2>Live Response</h2>
+            <p class="muted">Worker から返る JSON をそのまま表示します。</p>
+            <pre id="jsonOutput">{
+  "ready": true
+}</pre>
+          </article>
+        </div>
+
+        <div class="stack">
+          <article class="card">
+            <h2>Sample Video</h2>
+            <p class="muted">
+              審査用に公開している MP4 です。この URL を Upload API のサンプル入力に使います。
+            </p>
+            <video controls preload="metadata">
+              <source src="./assets/tiktok-app-review-remotion.mp4" type="video/mp4" />
+            </video>
+          </article>
+
+          <article class="card">
+            <h2>Current Configuration</h2>
+            <div class="meta-row">
+              <span class="pill">Login Kit</span>
+              <span class="pill">Content Posting API</span>
+              <span class="pill">video.upload</span>
+            </div>
+            <footer>
+              Worker:
+              <a href="https://tiktok-short-video-publisher-auth.chillsabo1125.workers.dev/tiktok/health">
+                /tiktok/health
+              </a>
+            </footer>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      const workerBase = "https://tiktok-short-video-publisher-auth.chillsabo1125.workers.dev";
+      const sampleVideoUrl =
+        "https://1125haruki.github.io/tiktok-short-video-publisher-site/assets/tiktok-app-review-remotion.mp4";
+
+      const connectButton = document.getElementById("connectButton");
+      const refreshSessionButton = document.getElementById("refreshSessionButton");
+      const uploadDraftButton = document.getElementById("uploadDraftButton");
+      const checkStatusButton = document.getElementById("checkStatusButton");
+      const videoUrlInput = document.getElementById("videoUrl");
+      const publishIdInput = document.getElementById("publishId");
+      const statusLine = document.getElementById("statusLine");
+      const jsonOutput = document.getElementById("jsonOutput");
+
+      videoUrlInput.value = sampleVideoUrl;
+      connectButton.href = `${workerBase}/tiktok/connect`;
+
+      function setStatus(message, isError = false) {
+        statusLine.textContent = message;
+        statusLine.classList.toggle("error", isError);
+      }
+
+      function showJson(data) {
+        jsonOutput.textContent = JSON.stringify(data, null, 2);
+      }
+
+      async function callJson(path, options = {}) {
+        const response = await fetch(`${workerBase}${path}`, {
+          credentials: "include",
+          ...options,
+          headers: {
+            "Content-Type": "application/json",
+            ...(options.headers || {}),
+          },
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          throw new Error(data.message || data.error || `HTTP ${response.status}`);
+        }
+        return data;
+      }
+
+      async function refreshSession() {
+        setStatus("接続状態を確認中です。");
+        try {
+          const data = await callJson("/tiktok/session");
+          showJson(data);
+          if (data.connected) {
+            const name = data.user?.display_name || data.user?.open_id || "connected";
+            setStatus(`TikTok 接続済みです: ${name}`);
+          } else {
+            setStatus("未接続です。TikTok を接続してください。", true);
+          }
+        } catch (error) {
+          showJson({ error: String(error.message || error) });
+          setStatus(`接続状態の取得に失敗しました: ${error.message || error}`, true);
+        }
+      }
+
+      async function uploadDraft() {
+        const videoUrl = videoUrlInput.value.trim();
+        if (!videoUrl) {
+          setStatus("MP4 の公開 URL が必要です。", true);
+          return;
+        }
+
+        setStatus("TikTok に下書き送信しています。");
+        try {
+          const data = await callJson("/tiktok/upload-draft", {
+            method: "POST",
+            body: JSON.stringify({ videoUrl }),
+          });
+          if (data.publishId) {
+            publishIdInput.value = data.publishId;
+          }
+          showJson(data);
+          setStatus("下書き送信を開始しました。publish status を確認してください。");
+        } catch (error) {
+          showJson({ error: String(error.message || error) });
+          setStatus(`下書き送信に失敗しました: ${error.message || error}`, true);
+        }
+      }
+
+      async function checkStatus() {
+        const publishId = publishIdInput.value.trim();
+        if (!publishId) {
+          setStatus("publishId が空です。先に下書き送信してください。", true);
+          return;
+        }
+
+        setStatus("publish status を取得しています。");
+        try {
+          const data = await callJson(`/tiktok/status?publish_id=${encodeURIComponent(publishId)}`);
+          showJson(data);
+          setStatus("publish status を取得しました。");
+        } catch (error) {
+          showJson({ error: String(error.message || error) });
+          setStatus(`status 取得に失敗しました: ${error.message || error}`, true);
+        }
+      }
+
+      refreshSessionButton.addEventListener("click", refreshSession);
+      uploadDraftButton.addEventListener("click", uploadDraft);
+      checkStatusButton.addEventListener("click", checkStatus);
+
+      if (new URLSearchParams(window.location.search).get("connected")) {
+        refreshSession();
+      }
+    </script>
+  </body>
+</html>
