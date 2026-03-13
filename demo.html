@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>TikTok Upload Demo | Short Video Publisher</title>
+    <title>Short Video Publisher | TikTok Live App Console</title>
     <style>
       :root {
         --bg: #f4efe6;
@@ -27,10 +27,26 @@
           radial-gradient(circle at bottom right, rgba(196, 126, 60, 0.16), transparent 32%),
           linear-gradient(180deg, #f7f3ea, #e8dfcf);
       }
-      main {
-        max-width: 1080px;
+      a {
+        color: inherit;
+      }
+      .shell {
+        max-width: 1120px;
         margin: 0 auto;
-        padding: 42px 18px 72px;
+        padding: 24px 18px 72px;
+      }
+      .topbar {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 16px;
+      }
+      .topbar a {
+        text-decoration: none;
+        color: var(--muted);
+        font-size: 14px;
       }
       .hero,
       .card {
@@ -44,55 +60,48 @@
       }
       .eyebrow {
         color: var(--accent);
-        font-size: 13px;
+        font-size: 12px;
         letter-spacing: 0.08em;
         text-transform: uppercase;
         margin-bottom: 10px;
       }
       h1,
       h2,
-      h3 {
+      h3,
+      p {
         margin: 0;
       }
       h1 {
-        font-size: clamp(32px, 5vw, 52px);
+        font-size: clamp(32px, 5vw, 54px);
         line-height: 1.02;
         margin-bottom: 14px;
       }
+      h2 {
+        margin-bottom: 10px;
+      }
       p {
-        margin: 0;
         line-height: 1.7;
       }
       .muted {
         color: var(--muted);
       }
-      .grid {
-        display: grid;
-        grid-template-columns: 1.3fr 1fr;
-        gap: 16px;
+      .callout {
         margin-top: 18px;
-      }
-      .stack {
-        display: grid;
-        gap: 16px;
-      }
-      .card {
-        padding: 22px;
+        padding: 16px 18px;
+        border-radius: 18px;
+        background: rgba(13, 124, 102, 0.08);
+        color: var(--accent);
+        font-weight: 600;
       }
       .steps {
         display: grid;
         gap: 12px;
-        margin-top: 16px;
+        margin-top: 18px;
       }
       .step {
         display: grid;
         grid-template-columns: 34px 1fr;
         gap: 12px;
-        align-items: start;
-      }
-      .step strong {
-        display: block;
-        margin-bottom: 4px;
       }
       .badge {
         width: 34px;
@@ -132,6 +141,19 @@
         background: rgba(196, 126, 60, 0.12);
         color: #7a4b16;
       }
+      .grid {
+        display: grid;
+        grid-template-columns: 1.25fr 0.95fr;
+        gap: 16px;
+        margin-top: 18px;
+      }
+      .stack {
+        display: grid;
+        gap: 16px;
+      }
+      .card {
+        padding: 22px;
+      }
       label {
         display: block;
         font-weight: 600;
@@ -145,18 +167,23 @@
         font: inherit;
         background: #fffdfa;
       }
-      code,
-      pre {
-        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      .meta {
+        display: grid;
+        gap: 10px;
+        margin-top: 14px;
       }
-      pre {
-        margin: 0;
-        padding: 16px;
-        border-radius: 16px;
-        background: #181818;
-        color: #f7f7f7;
-        overflow: auto;
-        min-height: 160px;
+      .meta-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      .pill {
+        display: inline-flex;
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: rgba(13, 124, 102, 0.08);
+        color: var(--accent);
+        font-size: 13px;
       }
       .status-line {
         margin-top: 12px;
@@ -170,24 +197,18 @@
         background: rgba(194, 65, 12, 0.08);
         color: var(--danger);
       }
-      .meta {
-        display: grid;
-        gap: 10px;
-        margin-top: 14px;
+      code,
+      pre {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
       }
-      .meta-row {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        align-items: center;
-      }
-      .pill {
-        display: inline-flex;
-        padding: 6px 10px;
-        border-radius: 999px;
-        background: rgba(13, 124, 102, 0.08);
-        color: var(--accent);
-        font-size: 13px;
+      pre {
+        margin: 0;
+        padding: 16px;
+        border-radius: 16px;
+        background: #181818;
+        color: #f7f7f7;
+        overflow: auto;
+        min-height: 180px;
       }
       video {
         width: 100%;
@@ -196,11 +217,11 @@
         background: #000;
       }
       footer {
-        margin-top: 18px;
+        margin-top: 16px;
         color: var(--muted);
         font-size: 14px;
       }
-      @media (max-width: 840px) {
+      @media (max-width: 880px) {
         .grid {
           grid-template-columns: 1fr;
         }
@@ -208,42 +229,55 @@
     </style>
   </head>
   <body>
-    <main>
+    <div class="shell">
+      <div class="topbar">
+        <div>
+          <a href="./index.html">Public Website</a>
+          /
+          <a href="./review.html">Review Walkthrough</a>
+        </div>
+        <a href="./privacy-policy.html">Privacy Policy</a>
+      </div>
+
       <section class="hero">
-        <div class="eyebrow">TikTok Review Demo</div>
-        <h1>Connect once, inspect session, then send a draft upload.</h1>
-        <p>
-          This page demonstrates the current TikTok integration for Short Video Publisher.
-          The flow uses Login Kit for account connection and the Content Posting Upload API to
-          send an original short-form video as a draft-ready upload flow.
+        <div class="eyebrow">Live App Console</div>
+        <h1>Connect TikTok, inspect the session, and create an upload draft.</h1>
+        <p class="muted">
+          This page is the dedicated application surface for the TikTok integration. It is intentionally
+          separate from the public home page so the Website URL remains a complete product site rather than a
+          login-only experience.
         </p>
+        <div class="callout">
+          Review note: the mockup walkthrough is on <a href="./review.html">review.html</a>. This page shows the
+          live web flow for TikTok Login Kit and the Content Posting draft upload request.
+        </div>
         <div class="steps">
           <div class="step">
             <div class="badge">1</div>
             <div>
               <strong>Connect TikTok</strong>
-              <p class="muted">Start OAuth on the worker domain and authorize the app.</p>
+              <p class="muted">Open TikTok OAuth, authorize the app, and return to this app console.</p>
             </div>
           </div>
           <div class="step">
             <div class="badge">2</div>
             <div>
-              <strong>Inspect session</strong>
-              <p class="muted">Fetch the connected account state and basic user profile.</p>
+              <strong>Inspect the connected session</strong>
+              <p class="muted">Confirm that the app can read the current TikTok account state.</p>
             </div>
           </div>
           <div class="step">
             <div class="badge">3</div>
             <div>
-              <strong>Send upload draft</strong>
-              <p class="muted">Initialize a TikTok Upload API draft from a public MP4 URL.</p>
+              <strong>Create an upload draft</strong>
+              <p class="muted">Initialize a TikTok Content Posting Upload API draft from the public MP4 sample.</p>
             </div>
           </div>
         </div>
         <div class="actions">
-          <a class="button-link button-primary" id="connectButton" href="#">TikTok を接続</a>
-          <button class="button-secondary" id="refreshSessionButton" type="button">接続状態を確認</button>
-          <a class="button-link button-tertiary" href="./index.html">公開トップへ戻る</a>
+          <a class="button-link button-primary" id="connectButton" href="#">Connect TikTok</a>
+          <button class="button-secondary" id="refreshSessionButton" type="button">Check Session</button>
+          <a class="button-link button-tertiary" href="./review.html">Open Mockup Walkthrough</a>
         </div>
       </section>
 
@@ -252,7 +286,8 @@
           <article class="card">
             <h2>Upload Draft</h2>
             <p class="muted">
-              公開 URL の MP4 を TikTok Upload API に渡します。最終投稿は TikTok 側で確認できます。
+              Submit the sample public MP4 URL to TikTok. The current production scope creates a draft request and
+              returns a publish ID for status inspection.
             </p>
             <div class="meta">
               <div>
@@ -260,20 +295,20 @@
                 <input id="videoUrl" type="url" />
               </div>
               <div class="actions">
-                <button class="button-primary" id="uploadDraftButton" type="button">下書き送信</button>
-                <button class="button-secondary" id="checkStatusButton" type="button">publish status 確認</button>
+                <button class="button-primary" id="uploadDraftButton" type="button">Create Upload Draft</button>
+                <button class="button-secondary" id="checkStatusButton" type="button">Check Publish Status</button>
               </div>
               <div>
                 <label for="publishId">Publish ID</label>
-                <input id="publishId" type="text" placeholder="upload 後に自動入力されます" />
+                <input id="publishId" type="text" placeholder="Filled after upload draft creation" />
               </div>
             </div>
-            <div class="status-line" id="statusLine">初期状態です。まず TikTok を接続してください。</div>
+            <div class="status-line" id="statusLine">Ready. Start by clicking Connect TikTok.</div>
           </article>
 
           <article class="card">
-            <h2>Live Response</h2>
-            <p class="muted">Worker から返る JSON をそのまま表示します。</p>
+            <h2>Live JSON Response</h2>
+            <p class="muted">Worker responses are shown directly below for review transparency.</p>
             <pre id="jsonOutput">{
   "ready": true
 }</pre>
@@ -282,32 +317,35 @@
 
         <div class="stack">
           <article class="card">
-            <h2>Sample Video</h2>
-            <p class="muted">
-              審査用に公開している MP4 です。この URL を Upload API のサンプル入力に使います。
-            </p>
+            <h2>Review Video</h2>
+            <p class="muted">A mockup video of the full integration path is available here and on the walkthrough page.</p>
             <video controls preload="metadata">
               <source src="./assets/tiktok-app-review-remotion.mp4" type="video/mp4" />
             </video>
           </article>
 
           <article class="card">
-            <h2>Current Configuration</h2>
+            <h2>Configuration Snapshot</h2>
             <div class="meta-row">
               <span class="pill">Login Kit</span>
               <span class="pill">Content Posting API</span>
               <span class="pill">video.upload</span>
             </div>
             <footer>
-              Worker:
+              Worker health:
               <a href="https://tiktok-short-video-publisher-auth.chillsabo1125.workers.dev/tiktok/health">
                 /tiktok/health
               </a>
+              <br />
+              Sample legal links:
+              <a href="./terms-of-service.html">Terms of Service</a>
+              /
+              <a href="./privacy-policy.html">Privacy Policy</a>
             </footer>
           </article>
         </div>
       </section>
-    </main>
+    </div>
 
     <script>
       const workerBase = "https://tiktok-short-video-publisher-auth.chillsabo1125.workers.dev";
@@ -352,30 +390,30 @@
       }
 
       async function refreshSession() {
-        setStatus("接続状態を確認中です。");
+        setStatus("Checking connected TikTok session.");
         try {
           const data = await callJson("/tiktok/session");
           showJson(data);
           if (data.connected) {
             const name = data.user?.display_name || data.user?.open_id || "connected";
-            setStatus(`TikTok 接続済みです: ${name}`);
+            setStatus(`TikTok connected: ${name}`);
           } else {
-            setStatus("未接続です。TikTok を接続してください。", true);
+            setStatus("No TikTok account is connected yet. Start login from this page.", true);
           }
         } catch (error) {
           showJson({ error: String(error.message || error) });
-          setStatus(`接続状態の取得に失敗しました: ${error.message || error}`, true);
+          setStatus(`Failed to load session: ${error.message || error}`, true);
         }
       }
 
       async function uploadDraft() {
         const videoUrl = videoUrlInput.value.trim();
         if (!videoUrl) {
-          setStatus("MP4 の公開 URL が必要です。", true);
+          setStatus("A public MP4 URL is required.", true);
           return;
         }
 
-        setStatus("TikTok に下書き送信しています。");
+        setStatus("Creating TikTok upload draft.");
         try {
           const data = await callJson("/tiktok/upload-draft", {
             method: "POST",
@@ -385,28 +423,28 @@
             publishIdInput.value = data.publishId;
           }
           showJson(data);
-          setStatus("下書き送信を開始しました。publish status を確認してください。");
+          setStatus("Upload draft request created. Use publish status to inspect progress.");
         } catch (error) {
           showJson({ error: String(error.message || error) });
-          setStatus(`下書き送信に失敗しました: ${error.message || error}`, true);
+          setStatus(`Failed to create upload draft: ${error.message || error}`, true);
         }
       }
 
       async function checkStatus() {
         const publishId = publishIdInput.value.trim();
         if (!publishId) {
-          setStatus("publishId が空です。先に下書き送信してください。", true);
+          setStatus("Enter or generate a publish ID first.", true);
           return;
         }
 
-        setStatus("publish status を取得しています。");
+        setStatus("Fetching publish status.");
         try {
           const data = await callJson(`/tiktok/status?publish_id=${encodeURIComponent(publishId)}`);
           showJson(data);
-          setStatus("publish status を取得しました。");
+          setStatus("Publish status loaded.");
         } catch (error) {
           showJson({ error: String(error.message || error) });
-          setStatus(`status 取得に失敗しました: ${error.message || error}`, true);
+          setStatus(`Failed to fetch publish status: ${error.message || error}`, true);
         }
       }
 

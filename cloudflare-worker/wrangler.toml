@@ -10,4 +10,4 @@ enabled = true
 TIKTOK_REDIRECT_URI = "https://tiktok-short-video-publisher-auth.chillsabo1125.workers.dev/tiktok/callback"
 TIKTOK_SCOPE = "user.info.basic,video.upload"
 ALLOWED_ORIGIN = "https://1125haruki.github.io"
-APP_RETURN_URL = "https://1125haruki.github.io/tiktok-short-video-publisher-site/"
+APP_RETURN_URL = "https://1125haruki.github.io/tiktok-short-video-publisher-site/demo.html"

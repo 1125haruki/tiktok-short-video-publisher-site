@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Short Video Publisher | TikTok Review Walkthrough</title>
+    <style>
+      :root {
+        --bg: #f5eee6;
+        --fg: #1f1b16;
+        --muted: #6f675f;
+        --line: #d8ccbb;
+        --card: rgba(255, 252, 246, 0.92);
+        --accent: #0d7c66;
+        --danger: #c2410c;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: "Hiragino Sans", "Yu Gothic", sans-serif;
+        color: var(--fg);
+        background:
+          radial-gradient(circle at top left, rgba(13, 124, 102, 0.16), transparent 26%),
+          radial-gradient(circle at bottom right, rgba(196, 126, 60, 0.14), transparent 30%),
+          linear-gradient(180deg, #f8f4ed, #e7ddcd);
+      }
+      a {
+        color: inherit;
+      }
+      .shell {
+        max-width: 1160px;
+        margin: 0 auto;
+        padding: 24px 18px 80px;
+      }
+      .topbar {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 16px;
+      }
+      .topbar a {
+        text-decoration: none;
+        color: var(--muted);
+        font-size: 14px;
+      }
+      .hero,
+      .card {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 26px;
+        backdrop-filter: blur(8px);
+      }
+      .hero {
+        padding: 30px;
+      }
+      .eyebrow {
+        color: var(--accent);
+        font-size: 12px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+      }
+      h1,
+      h2,
+      h3,
+      p {
+        margin: 0;
+      }
+      h1 {
+        font-size: clamp(34px, 5vw, 58px);
+        line-height: 1.02;
+        margin-bottom: 14px;
+      }
+      h2 {
+        font-size: clamp(26px, 4vw, 38px);
+        line-height: 1.06;
+        margin-bottom: 10px;
+      }
+      h3 {
+        margin-bottom: 8px;
+        font-size: 22px;
+      }
+      p {
+        line-height: 1.72;
+      }
+      .muted {
+        color: var(--muted);
+      }
+      .actions,
+      .timeline {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+      .actions {
+        margin-top: 22px;
+      }
+      .button {
+        appearance: none;
+        border: none;
+        border-radius: 999px;
+        padding: 13px 18px;
+        font: inherit;
+        text-decoration: none;
+        cursor: pointer;
+      }
+      .button-primary {
+        background: var(--accent);
+        color: #fff;
+      }
+      .button-secondary {
+        background: rgba(13, 124, 102, 0.08);
+        color: var(--accent);
+      }
+      .button-tertiary {
+        background: rgba(194, 65, 12, 0.08);
+        color: var(--danger);
+      }
+      .summary {
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr;
+        gap: 16px;
+        margin-top: 18px;
+      }
+      .card {
+        padding: 22px;
+      }
+      .pill-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 14px;
+      }
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        border-radius: 999px;
+        padding: 7px 11px;
+        background: rgba(13, 124, 102, 0.08);
+        color: var(--accent);
+        font-size: 13px;
+      }
+      .video-frame,
+      img {
+        width: 100%;
+        border-radius: 20px;
+        border: 1px solid var(--line);
+        background: #000;
+      }
+      .steps {
+        display: grid;
+        gap: 16px;
+        margin-top: 18px;
+      }
+      .step-card {
+        display: grid;
+        grid-template-columns: 1.08fr 0.92fr;
+        gap: 18px;
+        align-items: center;
+      }
+      .step-card img {
+        background: #f8f4ee;
+      }
+      .number {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 38px;
+        height: 38px;
+        border-radius: 999px;
+        background: rgba(13, 124, 102, 0.1);
+        color: var(--accent);
+        font-weight: 700;
+        margin-bottom: 12px;
+      }
+      ul {
+        margin: 12px 0 0;
+        padding-left: 18px;
+      }
+      li {
+        margin-bottom: 8px;
+        color: var(--muted);
+      }
+      footer {
+        margin-top: 18px;
+        color: var(--muted);
+        font-size: 14px;
+      }
+      @media (max-width: 960px) {
+        .summary,
+        .step-card {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <div class="topbar">
+        <div>
+          <a href="./index.html">Public Website</a>
+          /
+          <a href="./demo.html">Live App Console</a>
+        </div>
+        <a href="./terms-of-service.html">Terms of Service</a>
+      </div>
+
+      <section class="hero">
+        <div class="eyebrow">TikTok Review Walkthrough</div>
+        <h1>End-to-end mockup and live-web context for the TikTok integration.</h1>
+        <p class="muted">
+          This page is designed for app review. It explains how reviewers move from the public website to the
+          separate live app console, then through TikTok authorization, session inspection, draft upload, and
+          final creator review. The mockup video below is provided to make the flow clear even before using a
+          sandbox account.
+        </p>
+        <div class="actions">
+          <a class="button button-primary" href="./demo.html">Open Live App Console</a>
+          <a class="button button-secondary" href="./index.html">Return to Public Website</a>
+          <a class="button button-tertiary" href="./privacy-policy.html">Privacy Policy</a>
+        </div>
+      </section>
+
+      <section class="summary">
+        <article class="card">
+          <h2>Review Video</h2>
+          <p class="muted">
+            The video uses mockup screens to show the full TikTok path with website context. It covers the public
+            product site, live app console, Login Kit callback, draft upload creation, and final TikTok review.
+          </p>
+          <video class="video-frame" controls preload="metadata">
+            <source src="./assets/tiktok-app-review-remotion.mp4" type="video/mp4" />
+          </video>
+        </article>
+
+        <aside class="card">
+          <h2>Included in this walkthrough</h2>
+          <div class="pill-row">
+            <span class="pill">Public Website</span>
+            <span class="pill">Live App Console</span>
+            <span class="pill">Login Kit</span>
+            <span class="pill">Session Check</span>
+            <span class="pill">Draft Upload</span>
+            <span class="pill">Publish Status</span>
+          </div>
+          <ul>
+            <li>The Website URL is the public product home, not a login-only page.</li>
+            <li>The app console is separate and linked clearly from the public website.</li>
+            <li>The integration currently uses the safer draft upload path before final creator review in TikTok.</li>
+          </ul>
+        </aside>
+      </section>
+
+      <section class="steps">
+        <article class="card step-card">
+          <img src="./assets/review_slides/slide_01.png" alt="Mockup of the public website homepage" />
+          <div>
+            <span class="number">1</span>
+            <h3>Start from the public website</h3>
+            <p class="muted">
+              Reviewers land on the public product site at the submitted Website URL. The site provides product
+              overview, workflow explanation, legal pages, support links, and clear links into the review
+              walkthrough and live app console.
+            </p>
+          </div>
+        </article>
+
+        <article class="card step-card">
+          <img src="./assets/review_slides/slide_02.png" alt="Mockup of the live app console with Connect TikTok button" />
+          <div>
+            <span class="number">2</span>
+            <h3>Open the live app console and start Login Kit</h3>
+            <p class="muted">
+              The dedicated app console is on a separate page. From there, the reviewer or creator can click
+              `Connect TikTok` to start authorization and return to the same console after the callback.
+            </p>
+          </div>
+        </article>
+
+        <article class="card step-card">
+          <img src="./assets/review_slides/slide_03.png" alt="Mockup of session inspection after TikTok authorization" />
+          <div>
+            <span class="number">3</span>
+            <h3>Inspect the connected session</h3>
+            <p class="muted">
+              After the callback, the app checks the current session and shows the connected account status and
+              basic profile information in the live JSON panel.
+            </p>
+          </div>
+        </article>
+
+        <article class="card step-card">
+          <img src="./assets/review_slides/slide_04.png" alt="Mockup of upload draft form and publish ID response" />
+          <div>
+            <span class="number">4</span>
+            <h3>Create the draft upload request</h3>
+            <p class="muted">
+              The app uses the public MP4 URL to initialize a Content Posting Upload API draft. The response
+              includes the publish ID used for the status check.
+            </p>
+          </div>
+        </article>
+
+        <article class="card step-card">
+          <img src="./assets/review_slides/slide_05.png" alt="Mockup of publish status and final TikTok review stage" />
+          <div>
+            <span class="number">5</span>
+            <h3>Confirm status and finish review on TikTok</h3>
+            <p class="muted">
+              The current production scope stops at the safer draft stage. Final creator review and completion of
+              the posting flow occur on the TikTok side.
+            </p>
+          </div>
+        </article>
+      </section>
+
+      <footer>
+        Review resources:
+        <a href="./index.html">Public Website</a>
+        /
+        <a href="./demo.html">Live App Console</a>
+        /
+        <a href="https://tiktok-short-video-publisher-auth.chillsabo1125.workers.dev/tiktok/health">Worker Health</a>
+      </footer>
+    </div>
+  </body>
+</html>
