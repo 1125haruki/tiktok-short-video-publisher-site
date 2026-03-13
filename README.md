@@ -12,6 +12,9 @@ TikTok Developers 申請用の最小公開セットです。
 ## GitHub Pages 側で公開するファイル
 
 - `index.html`
+- `tour.html`
+- `workspace.html`
+- `help.html`
 - `review.html`
 - `demo.html`
 - `privacy-policy.html`
@@ -19,17 +22,21 @@ TikTok Developers 申請用の最小公開セットです。
 - `callback.html`
 
 `index.html` は外向けの完成した product website として使います。
-`review.html` は TikTok 審査向けの mockup walkthrough と動画案内ページです。
-`demo.html` は TikTok Login Kit と upload draft を実行する live app console です。
+`tour.html` は product walkthrough と workflow video の案内ページです。
+`workspace.html` は TikTok Login Kit と upload draft を実行する publisher workspace です。
+`help.html` は workflow と support の公開ヘルプページです。
+`review.html` と `demo.html` は古い URL からの redirect 用に残しています。
 
 ## TikTok Developers に登録する URL
 
 - `Web URL`
   - `https://1125haruki.github.io/tiktok-short-video-publisher-site/`
-- `Review Walkthrough`
-  - `https://1125haruki.github.io/tiktok-short-video-publisher-site/review.html`
-- `Live App Console`
-  - `https://1125haruki.github.io/tiktok-short-video-publisher-site/demo.html`
+- `Product Tour`
+  - `https://1125haruki.github.io/tiktok-short-video-publisher-site/tour.html`
+- `Publisher Workspace`
+  - `https://1125haruki.github.io/tiktok-short-video-publisher-site/workspace.html`
+- `Help Center`
+  - `https://1125haruki.github.io/tiktok-short-video-publisher-site/help.html`
 - `Privacy Policy URL`
   - `https://1125haruki.github.io/tiktok-short-video-publisher-site/privacy-policy.html`
 - `Terms of Service URL`
@@ -54,5 +61,5 @@ TikTok Developers 申請用の最小公開セットです。
 - Cloudflare Workers も小規模なら無料枠で始めやすい
 - `Redirect URI` は静的ページではなく server-side endpoint が必要
 - `Website URL` は login page ではなく public website にする
-- live な TikTok 認可導線は `demo.html` のような separate app page に分ける
-- end-to-end の説明は `review.html` と review video で補強する
+- live な TikTok 認可導線は `workspace.html` のような separate app page に分ける
+- workflow 動画と product walkthrough は `tour.html` にまとめる

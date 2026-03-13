@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Short Video Publisher | Publisher Workspace</title>
+    <style>
+      :root {
+        --bg: #f4efe6;
+        --fg: #1f1b16;
+        --muted: #6f675f;
+        --line: #d8ccbb;
+        --card: rgba(255, 252, 246, 0.92);
+        --accent: #0d7c66;
+        --warm: #c47e3c;
+        --danger: #c2410c;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: "Hiragino Sans", "Yu Gothic", sans-serif;
+        color: var(--fg);
+        background:
+          radial-gradient(circle at top left, rgba(13, 124, 102, 0.15), transparent 28%),
+          radial-gradient(circle at bottom right, rgba(196, 126, 60, 0.16), transparent 32%),
+          linear-gradient(180deg, #f7f3ea, #e8dfcf);
+      }
+      a {
+        color: inherit;
+      }
+      .shell {
+        max-width: 1160px;
+        margin: 0 auto;
+        padding: 24px 18px 72px;
+      }
+      .topbar {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 16px;
+      }
+      .topbar a {
+        text-decoration: none;
+        color: var(--muted);
+        font-size: 14px;
+      }
+      .hero,
+      .card {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 24px;
+        backdrop-filter: blur(8px);
+      }
+      .hero {
+        padding: 28px;
+      }
+      .eyebrow {
+        color: var(--accent);
+        font-size: 12px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+      }
+      h1,
+      h2,
+      h3,
+      p {
+        margin: 0;
+      }
+      h1 {
+        font-size: clamp(32px, 5vw, 54px);
+        line-height: 1.02;
+        margin-bottom: 14px;
+      }
+      h2 {
+        margin-bottom: 10px;
+      }
+      h3 {
+        margin-bottom: 8px;
+      }
+      p {
+        line-height: 1.7;
+      }
+      .muted {
+        color: var(--muted);
+      }
+      .callout {
+        margin-top: 18px;
+        padding: 16px 18px;
+        border-radius: 18px;
+        background: rgba(13, 124, 102, 0.08);
+        color: var(--accent);
+      }
+      .steps {
+        display: grid;
+        gap: 12px;
+        margin-top: 18px;
+      }
+      .step {
+        display: grid;
+        grid-template-columns: 34px 1fr;
+        gap: 12px;
+      }
+      .badge {
+        width: 34px;
+        height: 34px;
+        border-radius: 999px;
+        display: grid;
+        place-items: center;
+        background: rgba(13, 124, 102, 0.1);
+        color: var(--accent);
+        font-weight: 700;
+      }
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 18px;
+      }
+      button,
+      .button-link {
+        appearance: none;
+        border: none;
+        border-radius: 999px;
+        padding: 13px 18px;
+        font: inherit;
+        cursor: pointer;
+        text-decoration: none;
+      }
+      .button-primary {
+        background: var(--accent);
+        color: #fff;
+      }
+      .button-secondary {
+        background: rgba(13, 124, 102, 0.08);
+        color: var(--accent);
+      }
+      .button-warm {
+        background: rgba(196, 126, 60, 0.12);
+        color: #7a4b16;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: 1.18fr 0.82fr;
+        gap: 16px;
+        margin-top: 18px;
+      }
+      .stack {
+        display: grid;
+        gap: 16px;
+      }
+      .card {
+        padding: 22px;
+      }
+      label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 8px;
+      }
+      input,
+      textarea {
+        width: 100%;
+        padding: 12px 14px;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        font: inherit;
+        background: #fffdfa;
+      }
+      textarea {
+        min-height: 96px;
+        resize: vertical;
+      }
+      .meta {
+        display: grid;
+        gap: 12px;
+        margin-top: 14px;
+      }
+      .meta-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      .pill {
+        display: inline-flex;
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: rgba(13, 124, 102, 0.08);
+        color: var(--accent);
+        font-size: 13px;
+      }
+      .status-line {
+        margin-top: 12px;
+        padding: 12px 14px;
+        border-radius: 14px;
+        background: rgba(13, 124, 102, 0.08);
+        color: var(--accent);
+        font-weight: 600;
+      }
+      .status-line.error {
+        background: rgba(194, 65, 12, 0.08);
+        color: var(--danger);
+      }
+      .checkline {
+        display: flex;
+        gap: 10px;
+        align-items: start;
+        color: var(--muted);
+      }
+      .checkline input {
+        width: auto;
+        margin-top: 4px;
+      }
+      .preview-panel {
+        padding: 16px;
+        border-radius: 18px;
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.7);
+        display: grid;
+        gap: 12px;
+      }
+      .preview-row strong,
+      .preview-row span {
+        display: block;
+      }
+      .preview-row strong {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--muted);
+        margin-bottom: 4px;
+      }
+      .preview-row span {
+        line-height: 1.6;
+      }
+      code,
+      pre {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      }
+      pre {
+        margin: 0;
+        padding: 16px;
+        border-radius: 16px;
+        background: #181818;
+        color: #f7f7f7;
+        overflow: auto;
+        min-height: 180px;
+      }
+      video {
+        width: 100%;
+        border-radius: 18px;
+        border: 1px solid var(--line);
+        background: #000;
+      }
+      @media (max-width: 900px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <div class="topbar">
+        <div>
+          <a href="./index.html">Public Website</a>
+          /
+          <a href="./tour.html">Product Tour</a>
+          /
+          <a href="./help.html">Help Center</a>
+        </div>
+        <a href="./privacy-policy.html">Privacy Policy</a>
+      </div>
+
+      <section class="hero">
+        <div class="eyebrow">Publisher Workspace</div>
+        <h1>Prepare a draft delivery, then continue final review inside TikTok.</h1>
+        <p class="muted">
+          This workspace is where creators connect TikTok, confirm the active account, prepare draft metadata, and
+          start a Content Posting draft upload from a public MP4 source.
+        </p>
+        <div class="callout">
+          Current scope: Login Kit, session check, draft upload initialization, and publish status inspection.
+          Final editing and publish confirmation continue in the TikTok inbox flow.
+        </div>
+        <div class="steps">
+          <div class="step">
+            <div class="badge">1</div>
+            <div>
+              <strong>Connect the creator account</strong>
+              <p class="muted">Authorize TikTok and return to this workspace.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="badge">2</div>
+            <div>
+              <strong>Prepare draft details</strong>
+              <p class="muted">Check creator identity, source video, title, and internal posting note.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="badge">3</div>
+            <div>
+              <strong>Create the draft request</strong>
+              <p class="muted">Initialize the TikTok draft upload and keep the publish ID for follow-up checks.</p>
+            </div>
+          </div>
+        </div>
+        <div class="actions">
+          <a class="button-link button-primary" id="connectButton" href="#">Connect TikTok</a>
+          <button class="button-secondary" id="refreshSessionButton" type="button">Refresh Creator Session</button>
+          <a class="button-link button-warm" href="./tour.html">View Product Tour</a>
+        </div>
+      </section>
+
+      <section class="grid">
+        <div class="stack">
+          <article class="card">
+            <h2>Draft Setup</h2>
+            <p class="muted">
+              Prepare the asset and draft note before sending the request to TikTok. These fields explain the
+              website function even when the final post editing continues inside TikTok.
+            </p>
+            <div class="meta">
+              <div>
+                <label for="videoUrl">Public MP4 URL</label>
+                <input id="videoUrl" type="url" />
+              </div>
+              <div>
+                <label for="draftTitle">Draft title</label>
+                <input id="draftTitle" type="text" placeholder="Example: Spring lookbook teaser" />
+              </div>
+              <div>
+                <label for="draftNote">Internal caption / posting note</label>
+                <textarea id="draftNote" placeholder="Example: Final hashtags and text are confirmed in the TikTok inbox review step."></textarea>
+              </div>
+              <label class="checkline">
+                <input id="consentCheckbox" type="checkbox" />
+                <span>I confirm this creator owns or is authorized to publish this video and will complete the final review inside TikTok.</span>
+              </label>
+              <div class="actions">
+                <button class="button-primary" id="uploadDraftButton" type="button">Create Upload Draft</button>
+                <button class="button-secondary" id="checkStatusButton" type="button">Check Publish Status</button>
+              </div>
+              <div>
+                <label for="publishId">Publish ID</label>
+                <input id="publishId" type="text" placeholder="Filled after upload draft creation" />
+              </div>
+            </div>
+            <div class="status-line" id="statusLine">Ready. Connect TikTok or refresh the current creator session.</div>
+          </article>
+
+          <article class="card">
+            <h2>Live JSON Response</h2>
+            <p class="muted">Worker responses are shown below for transparency during account connection and status checks.</p>
+            <pre id="jsonOutput">{
+  "ready": true
+}</pre>
+          </article>
+        </div>
+
+        <div class="stack">
+          <article class="card">
+            <h2>Connected Creator</h2>
+            <div class="preview-panel">
+              <div class="preview-row">
+                <strong>Creator</strong>
+                <span id="creatorName">No creator connected yet</span>
+              </div>
+              <div class="preview-row">
+                <strong>Current Scope</strong>
+                <span id="creatorScope">user.info.basic, video.upload</span>
+              </div>
+              <div class="preview-row">
+                <strong>Next Step After Draft</strong>
+                <span>TikTok notifies the creator to continue editing and final review in the inbox flow.</span>
+              </div>
+            </div>
+          </article>
+
+          <article class="card">
+            <h2>Draft Preview</h2>
+            <div class="preview-panel">
+              <div class="preview-row">
+                <strong>Prepared title</strong>
+                <span id="previewTitle">Spring lookbook teaser</span>
+              </div>
+              <div class="preview-row">
+                <strong>Prepared note</strong>
+                <span id="previewNote">Final hashtags and text are confirmed in the TikTok inbox review step.</span>
+              </div>
+              <div class="preview-row">
+                <strong>Source video</strong>
+                <span id="previewVideo">Public MP4 sample is loaded by default.</span>
+              </div>
+            </div>
+          </article>
+
+          <article class="card">
+            <h2>Workflow Tour Video</h2>
+            <p class="muted">The product tour video shows the website, workspace, and draft flow end to end.</p>
+            <video controls preload="metadata">
+              <source src="./assets/short-video-publisher-product-tour.mp4" type="video/mp4" />
+            </video>
+          </article>
+        </div>
+      </section>
+    </div>
+
+    <script>
+      const workerBase = "https://tiktok-short-video-publisher-auth.chillsabo1125.workers.dev";
+      const sampleVideoUrl =
+        "https://1125haruki.github.io/tiktok-short-video-publisher-site/assets/short-video-publisher-product-tour.mp4";
+
+      const connectButton = document.getElementById("connectButton");
+      const refreshSessionButton = document.getElementById("refreshSessionButton");
+      const uploadDraftButton = document.getElementById("uploadDraftButton");
+      const checkStatusButton = document.getElementById("checkStatusButton");
+      const videoUrlInput = document.getElementById("videoUrl");
+      const draftTitleInput = document.getElementById("draftTitle");
+      const draftNoteInput = document.getElementById("draftNote");
+      const consentCheckbox = document.getElementById("consentCheckbox");
+      const publishIdInput = document.getElementById("publishId");
+      const statusLine = document.getElementById("statusLine");
+      const jsonOutput = document.getElementById("jsonOutput");
+      const creatorName = document.getElementById("creatorName");
+      const creatorScope = document.getElementById("creatorScope");
+      const previewTitle = document.getElementById("previewTitle");
+      const previewNote = document.getElementById("previewNote");
+      const previewVideo = document.getElementById("previewVideo");
+
+      videoUrlInput.value = sampleVideoUrl;
+      draftTitleInput.value = "Spring lookbook teaser";
+      draftNoteInput.value =
+        "Final hashtags and text are confirmed in the TikTok inbox review step.";
+      connectButton.href = `${workerBase}/tiktok/connect`;
+
+      function setStatus(message, isError = false) {
+        statusLine.textContent = message;
+        statusLine.classList.toggle("error", isError);
+      }
+
+      function showJson(data) {
+        jsonOutput.textContent = JSON.stringify(data, null, 2);
+      }
+
+      function syncPreview() {
+        previewTitle.textContent = draftTitleInput.value.trim() || "No title prepared yet.";
+        previewNote.textContent = draftNoteInput.value.trim() || "No note prepared yet.";
+        previewVideo.textContent = videoUrlInput.value.trim() || "No public MP4 URL set.";
+      }
+
+      async function callJson(path, options = {}) {
+        const response = await fetch(`${workerBase}${path}`, {
+          credentials: "include",
+          ...options,
+          headers: {
+            "Content-Type": "application/json",
+            ...(options.headers || {}),
+          },
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          throw new Error(data.message || data.error || `HTTP ${response.status}`);
+        }
+        return data;
+      }
+
+      async function refreshSession() {
+        setStatus("Checking connected TikTok creator session.");
+        try {
+          const data = await callJson("/tiktok/session");
+          showJson(data);
+          if (data.connected) {
+            const name = data.user?.display_name || data.user?.open_id || "connected";
+            creatorName.textContent = name;
+            creatorScope.textContent = data.scope || "user.info.basic, video.upload";
+            setStatus(`TikTok creator connected: ${name}`);
+          } else {
+            creatorName.textContent = "No creator connected yet";
+            creatorScope.textContent = "user.info.basic, video.upload";
+            setStatus("No TikTok account is connected yet. Start login from this workspace.", true);
+          }
+        } catch (error) {
+          creatorName.textContent = "Connection unavailable";
+          showJson({ error: String(error.message || error) });
+          setStatus(`Failed to load session: ${error.message || error}`, true);
+        }
+      }
+
+      async function uploadDraft() {
+        const videoUrl = videoUrlInput.value.trim();
+        if (!videoUrl) {
+          setStatus("A public MP4 URL is required.", true);
+          return;
+        }
+        if (!consentCheckbox.checked) {
+          setStatus("Confirm creator authorization and final TikTok review before creating the draft.", true);
+          return;
+        }
+
+        setStatus("Creating TikTok upload draft.");
+        try {
+          const data = await callJson("/tiktok/upload-draft", {
+            method: "POST",
+            body: JSON.stringify({ videoUrl }),
+          });
+          if (data.publishId) {
+            publishIdInput.value = data.publishId;
+          }
+          showJson({
+            ...data,
+            preparedMetadata: {
+              draftTitle: draftTitleInput.value.trim(),
+              draftNote: draftNoteInput.value.trim(),
+            },
+          });
+          setStatus("Upload draft request created. Use publish status to inspect progress.");
+        } catch (error) {
+          showJson({ error: String(error.message || error) });
+          setStatus(`Failed to create upload draft: ${error.message || error}`, true);
+        }
+      }
+
+      async function checkStatus() {
+        const publishId = publishIdInput.value.trim();
+        if (!publishId) {
+          setStatus("Enter or generate a publish ID first.", true);
+          return;
+        }
+
+        setStatus("Fetching publish status.");
+        try {
+          const data = await callJson(`/tiktok/status?publish_id=${encodeURIComponent(publishId)}`);
+          showJson(data);
+          setStatus("Publish status loaded.");
+        } catch (error) {
+          showJson({ error: String(error.message || error) });
+          setStatus(`Failed to fetch publish status: ${error.message || error}`, true);
+        }
+      }
+
+      refreshSessionButton.addEventListener("click", refreshSession);
+      uploadDraftButton.addEventListener("click", uploadDraft);
+      checkStatusButton.addEventListener("click", checkStatus);
+      videoUrlInput.addEventListener("input", syncPreview);
+      draftTitleInput.addEventListener("input", syncPreview);
+      draftNoteInput.addEventListener("input", syncPreview);
+
+      syncPreview();
+      refreshSession().catch(() => {});
+
+      if (new URLSearchParams(window.location.search).get("connected")) {
+        refreshSession();
+      }
+    </script>
+  </body>
+</html>

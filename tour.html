@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Short Video Publisher | Product Tour</title>
+    <style>
+      :root {
+        --bg: #f5eee6;
+        --fg: #1f1b16;
+        --muted: #6f675f;
+        --line: #d8ccbb;
+        --card: rgba(255, 252, 246, 0.92);
+        --accent: #0d7c66;
+        --warm: #c47e3c;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: "Hiragino Sans", "Yu Gothic", sans-serif;
+        color: var(--fg);
+        background:
+          radial-gradient(circle at top left, rgba(13, 124, 102, 0.16), transparent 26%),
+          radial-gradient(circle at bottom right, rgba(196, 126, 60, 0.14), transparent 30%),
+          linear-gradient(180deg, #f8f4ed, #e7ddcd);
+      }
+      a {
+        color: inherit;
+      }
+      .shell {
+        max-width: 1160px;
+        margin: 0 auto;
+        padding: 24px 18px 80px;
+      }
+      .topbar {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 16px;
+      }
+      .topbar a {
+        text-decoration: none;
+        color: var(--muted);
+        font-size: 14px;
+      }
+      .hero,
+      .card {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 26px;
+        backdrop-filter: blur(8px);
+      }
+      .hero {
+        padding: 30px;
+      }
+      .eyebrow {
+        color: var(--accent);
+        font-size: 12px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+      }
+      h1,
+      h2,
+      h3,
+      p {
+        margin: 0;
+      }
+      h1 {
+        font-size: clamp(34px, 5vw, 58px);
+        line-height: 1.02;
+        margin-bottom: 14px;
+      }
+      h2 {
+        font-size: clamp(26px, 4vw, 38px);
+        line-height: 1.06;
+        margin-bottom: 10px;
+      }
+      h3 {
+        margin-bottom: 8px;
+        font-size: 22px;
+      }
+      p {
+        line-height: 1.72;
+      }
+      .muted {
+        color: var(--muted);
+      }
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 22px;
+      }
+      .button {
+        appearance: none;
+        border: none;
+        border-radius: 999px;
+        padding: 13px 18px;
+        font: inherit;
+        text-decoration: none;
+        cursor: pointer;
+      }
+      .button-primary {
+        background: var(--accent);
+        color: #fff;
+      }
+      .button-secondary {
+        background: rgba(13, 124, 102, 0.08);
+        color: var(--accent);
+      }
+      .button-warm {
+        background: rgba(196, 126, 60, 0.12);
+        color: #7a4b16;
+      }
+      .summary {
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr;
+        gap: 16px;
+        margin-top: 18px;
+      }
+      .card {
+        padding: 22px;
+      }
+      .pill-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 14px;
+      }
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        border-radius: 999px;
+        padding: 7px 11px;
+        background: rgba(13, 124, 102, 0.08);
+        color: var(--accent);
+        font-size: 13px;
+      }
+      .video-frame,
+      img {
+        width: 100%;
+        border-radius: 20px;
+        border: 1px solid var(--line);
+        background: #000;
+      }
+      .steps {
+        display: grid;
+        gap: 16px;
+        margin-top: 18px;
+      }
+      .step-card {
+        display: grid;
+        grid-template-columns: 1.08fr 0.92fr;
+        gap: 18px;
+        align-items: center;
+      }
+      .step-card img {
+        background: #f8f4ee;
+      }
+      .number {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 38px;
+        height: 38px;
+        border-radius: 999px;
+        background: rgba(13, 124, 102, 0.1);
+        color: var(--accent);
+        font-weight: 700;
+        margin-bottom: 12px;
+      }
+      ul {
+        margin: 12px 0 0;
+        padding-left: 18px;
+      }
+      li {
+        margin-bottom: 8px;
+        color: var(--muted);
+      }
+      footer {
+        margin-top: 18px;
+        color: var(--muted);
+        font-size: 14px;
+      }
+      @media (max-width: 960px) {
+        .summary,
+        .step-card {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <div class="topbar">
+        <div>
+          <a href="./index.html">Public Website</a>
+          /
+          <a href="./workspace.html">Publisher Workspace</a>
+          /
+          <a href="./help.html">Help Center</a>
+        </div>
+        <a href="./terms-of-service.html">Terms of Service</a>
+      </div>
+
+      <section class="hero">
+        <div class="eyebrow">Product Tour</div>
+        <h1>See how the website, workspace, and TikTok draft flow fit together.</h1>
+        <p class="muted">
+          This tour explains the complete product journey: starting on the public website, moving into the
+          publisher workspace, connecting TikTok, preparing a draft upload, checking publish status, and finishing
+          final review inside TikTok.
+        </p>
+        <div class="actions">
+          <a class="button button-primary" href="./workspace.html">Open Publisher Workspace</a>
+          <a class="button button-secondary" href="./index.html">Return to Public Website</a>
+          <a class="button button-warm" href="./help.html">Open Help Center</a>
+        </div>
+      </section>
+
+      <section class="summary">
+        <article class="card">
+          <h2>Workflow Video</h2>
+          <p class="muted">
+            The video uses mockup screens to show the website functions and the TikTok draft workflow with clear
+            context before the final TikTok review step.
+          </p>
+          <video class="video-frame" controls preload="metadata">
+            <source src="./assets/short-video-publisher-product-tour.mp4" type="video/mp4" />
+          </video>
+        </article>
+
+        <aside class="card">
+          <h2>What this tour covers</h2>
+          <div class="pill-row">
+            <span class="pill">Website</span>
+            <span class="pill">Help Center</span>
+            <span class="pill">Workspace</span>
+            <span class="pill">Login Kit</span>
+            <span class="pill">Draft Upload</span>
+            <span class="pill">Status Check</span>
+          </div>
+          <ul>
+            <li>The Website URL is a public product site with workflow and support pages.</li>
+            <li>The workspace is separate and used for TikTok authorization and draft creation.</li>
+            <li>The final publish review remains on TikTok after the draft request is created.</li>
+          </ul>
+        </aside>
+      </section>
+
+      <section class="steps">
+        <article class="card step-card">
+          <img src="./assets/review_slides/slide_01.png" alt="Mockup of the public website homepage" />
+          <div>
+            <span class="number">1</span>
+            <h3>Start on the public product website</h3>
+            <p class="muted">
+              Creators first browse the public website, where the product, workflow, legal pages, and support
+              resources are explained.
+            </p>
+          </div>
+        </article>
+
+        <article class="card step-card">
+          <img src="./assets/review_slides/slide_02.png" alt="Mockup of the publisher workspace" />
+          <div>
+            <span class="number">2</span>
+            <h3>Open the publisher workspace</h3>
+            <p class="muted">
+              The creator moves from the website into the separate workspace page to connect TikTok and prepare the
+              draft.
+            </p>
+          </div>
+        </article>
+
+        <article class="card step-card">
+          <img src="./assets/review_slides/slide_03.png" alt="Mockup of session inspection after TikTok authorization" />
+          <div>
+            <span class="number">3</span>
+            <h3>Confirm the connected creator</h3>
+            <p class="muted">
+              After Login Kit returns, the workspace confirms the creator session and keeps the identity visible.
+            </p>
+          </div>
+        </article>
+
+        <article class="card step-card">
+          <img src="./assets/review_slides/slide_04.png" alt="Mockup of draft upload preparation" />
+          <div>
+            <span class="number">4</span>
+            <h3>Prepare and create the draft upload</h3>
+            <p class="muted">
+              The workspace prepares the source video and draft note, then initializes the TikTok draft upload
+              request and returns the publish ID.
+            </p>
+          </div>
+        </article>
+
+        <article class="card step-card">
+          <img src="./assets/review_slides/slide_05.png" alt="Mockup of publish status and TikTok final review stage" />
+          <div>
+            <span class="number">5</span>
+            <h3>Check status and finish on TikTok</h3>
+            <p class="muted">
+              The workspace checks the publish status, and the creator completes the final editing and review inside
+              TikTok.
+            </p>
+          </div>
+        </article>
+      </section>
+
+      <footer>
+        Product tour resources:
+        <a href="./index.html">Public Website</a>
+        /
+        <a href="./workspace.html">Publisher Workspace</a>
+        /
+        <a href="./help.html">Help Center</a>
+      </footer>
+    </div>
+  </body>
+</html>

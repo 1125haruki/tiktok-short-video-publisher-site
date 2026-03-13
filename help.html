@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Short Video Publisher | Help Center</title>
+    <style>
+      :root {
+        --bg: #f4efe7;
+        --fg: #1f1b16;
+        --muted: #6f675f;
+        --line: #d8ccbb;
+        --card: rgba(255, 252, 246, 0.92);
+        --accent: #0d7c66;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: "Hiragino Sans", "Yu Gothic", sans-serif;
+        color: var(--fg);
+        background:
+          radial-gradient(circle at top left, rgba(13, 124, 102, 0.12), transparent 28%),
+          radial-gradient(circle at bottom right, rgba(196, 126, 60, 0.12), transparent 32%),
+          linear-gradient(180deg, #f8f4ed, #e7ddce);
+      }
+      a {
+        color: inherit;
+      }
+      .shell {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 24px 18px 80px;
+      }
+      .topbar {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 16px;
+      }
+      .topbar a {
+        text-decoration: none;
+        color: var(--muted);
+        font-size: 14px;
+      }
+      .hero,
+      .card {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 24px;
+        backdrop-filter: blur(8px);
+      }
+      .hero {
+        padding: 28px;
+      }
+      .eyebrow {
+        color: var(--accent);
+        font-size: 12px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+      }
+      h1,
+      h2,
+      h3,
+      p {
+        margin: 0;
+      }
+      h1 {
+        font-size: clamp(32px, 5vw, 54px);
+        line-height: 1.02;
+        margin-bottom: 14px;
+      }
+      h2 {
+        margin-bottom: 10px;
+      }
+      p {
+        line-height: 1.72;
+      }
+      .muted {
+        color: var(--muted);
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin-top: 18px;
+      }
+      .card {
+        padding: 22px;
+      }
+      .steps {
+        display: grid;
+        gap: 12px;
+        margin-top: 12px;
+      }
+      .step {
+        display: grid;
+        grid-template-columns: 34px 1fr;
+        gap: 12px;
+      }
+      .badge {
+        width: 34px;
+        height: 34px;
+        border-radius: 999px;
+        display: grid;
+        place-items: center;
+        background: rgba(13, 124, 102, 0.1);
+        color: var(--accent);
+        font-weight: 700;
+      }
+      ul {
+        margin: 12px 0 0;
+        padding-left: 18px;
+      }
+      li {
+        margin-bottom: 8px;
+        color: var(--muted);
+      }
+      .link-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 16px;
+      }
+      .link-list a {
+        text-decoration: none;
+        padding: 12px 16px;
+        border-radius: 999px;
+        background: rgba(13, 124, 102, 0.08);
+        color: var(--accent);
+      }
+      @media (max-width: 860px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <div class="topbar">
+        <div>
+          <a href="./index.html">Public Website</a>
+          /
+          <a href="./tour.html">Product Tour</a>
+          /
+          <a href="./workspace.html">Publisher Workspace</a>
+        </div>
+        <a href="./privacy-policy.html">Privacy Policy</a>
+      </div>
+
+      <section class="hero">
+        <div class="eyebrow">Help Center</div>
+        <h1>Setup, workflow, and support for Short Video Publisher.</h1>
+        <p class="muted">
+          This help center explains how creators move from the public website into the publisher workspace, connect
+          TikTok, prepare a draft upload, and complete the final publish review on TikTok.
+        </p>
+        <div class="link-list">
+          <a href="./workspace.html">Open Publisher Workspace</a>
+          <a href="./tour.html">Watch Product Tour</a>
+          <a href="https://github.com/1125haruki/tiktok-short-video-publisher-site/issues">Support</a>
+        </div>
+      </section>
+
+      <section class="grid">
+        <article class="card">
+          <h2>Getting Started</h2>
+          <div class="steps">
+            <div class="step">
+              <div class="badge">1</div>
+              <div>
+                <h3>Open the workspace</h3>
+                <p class="muted">Move from the public website into the dedicated publisher workspace page.</p>
+              </div>
+            </div>
+            <div class="step">
+              <div class="badge">2</div>
+              <div>
+                <h3>Connect TikTok</h3>
+                <p class="muted">Use Login Kit to authorize the creator account and return to the workspace.</p>
+              </div>
+            </div>
+            <div class="step">
+              <div class="badge">3</div>
+              <div>
+                <h3>Create a draft upload</h3>
+                <p class="muted">Prepare the public MP4 source and initialize the TikTok draft request.</p>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <h2>Current TikTok Scope</h2>
+          <ul>
+            <li>Login Kit for creator account connection</li>
+            <li>`user.info.basic` for the connected account display</li>
+            <li>`video.upload` for TikTok draft upload initialization</li>
+            <li>Publish status inspection from the returned publish ID</li>
+            <li>Final editing and publish confirmation on TikTok</li>
+          </ul>
+        </article>
+
+        <article class="card">
+          <h2>Draft Workflow</h2>
+          <ul>
+            <li>Prepare the public MP4 URL and internal posting note inside the workspace</li>
+            <li>Confirm creator authorization before creating the draft upload request</li>
+            <li>Keep the publish ID to inspect status later from the same workspace</li>
+            <li>Finish final review in TikTok after the draft is created</li>
+          </ul>
+        </article>
+
+        <article class="card">
+          <h2>Support and Legal</h2>
+          <ul>
+            <li><a href="./privacy-policy.html">Privacy Policy</a></li>
+            <li><a href="./terms-of-service.html">Terms of Service</a></li>
+            <li><a href="./tour.html">Product Tour</a></li>
+            <li><a href="https://github.com/1125haruki/tiktok-short-video-publisher-site/issues">Support via GitHub Issues</a></li>
+          </ul>
+        </article>
+      </section>
+    </div>
+  </body>
+</html>

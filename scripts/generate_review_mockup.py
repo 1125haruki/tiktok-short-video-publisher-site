@@ -9,7 +9,7 @@ from PIL import Image, ImageDraw, ImageFont
 ROOT = Path("/Users/takasuharuki/dev26/tiktok-short-video-publisher-site")
 ASSETS = ROOT / "assets"
 SLIDES = ASSETS / "review_slides"
-OUT_FILE = ASSETS / "tiktok-app-review-remotion.mp4"
+OUT_FILE = ASSETS / "short-video-publisher-product-tour.mp4"
 
 W = 1280
 H = 720
@@ -100,44 +100,44 @@ def slide_homepage() -> Image.Image:
     draw = ImageDraw.Draw(img)
     browser(draw, "Short Video Publisher public website", "https://1125haruki.github.io/tiktok-short-video-publisher-site/")
     draw.text((96, 228), "Prepare short-form uploads before they reach TikTok.", font=font(34, bold=True), fill=TEXT)
-    draw.text((96, 276), "Public website with product, workflow, support, and review resources.", font=font(18), fill=MUTED)
-    button(draw, 96, 326, 218, "Review Walkthrough", primary=True)
-    button(draw, 330, 326, 218, "Live App Console", primary=False)
-    metric_card(draw, 96, 392, 310, "Public website", "Product context, legal pages,\nand support routing.")
-    metric_card(draw, 426, 392, 310, "Review walkthrough", "Mockup video plus step-by-step\nintegration explanation.")
-    metric_card(draw, 756, 392, 310, "Live app console", "Separate page for TikTok Login Kit\nand draft upload.")
+    draw.text((96, 276), "Public website with product pages, help content, support, and workflow overview.", font=font(18), fill=MUTED)
+    button(draw, 96, 326, 192, "Product Tour", primary=True)
+    button(draw, 304, 326, 222, "Publisher Workspace", primary=False)
+    metric_card(draw, 96, 392, 310, "Public website", "Product context, legal pages,\nhelp content, and support routing.")
+    metric_card(draw, 426, 392, 310, "Product tour", "Workflow video plus step-by-step\nproduct explanation.")
+    metric_card(draw, 756, 392, 310, "Workspace", "Separate page for TikTok Login Kit,\ndraft setup, and status checks.")
     pill(draw, 96, 188, "Public Website URL")
-    annotate(draw, "Step 1", ["Reviewer starts on the public website,", "not on a login-only page."])
+    annotate(draw, "Step 1", ["Creators start on the public website,", "not on a login-only page."])
     return img
 
 
 def slide_console() -> Image.Image:
     img = base_canvas()
     draw = ImageDraw.Draw(img)
-    browser(draw, "Short Video Publisher live app console", "https://1125haruki.github.io/tiktok-short-video-publisher-site/demo.html")
-    draw.text((96, 228), "Connect TikTok, inspect the session, and create an upload draft.", font=font(30, bold=True), fill=TEXT)
-    draw.text((96, 272), "This page is the separate app surface used for the live TikTok web flow.", font=font(17), fill=MUTED)
+    browser(draw, "Short Video Publisher publisher workspace", "https://1125haruki.github.io/tiktok-short-video-publisher-site/workspace.html")
+    draw.text((96, 228), "Connect TikTok, prepare the draft, and create the upload request.", font=font(30, bold=True), fill=TEXT)
+    draw.text((96, 272), "This separate workspace page handles the live TikTok web flow and draft setup.", font=font(17), fill=MUTED)
     button(draw, 96, 320, 190, "Connect TikTok", primary=True)
-    button(draw, 304, 320, 182, "Check Session", primary=False)
-    metric_card(draw, 96, 390, 420, "App console actions", "Start TikTok Login Kit,\ncheck session, and create a draft upload.")
+    button(draw, 304, 320, 182, "Refresh Session", primary=False)
+    metric_card(draw, 96, 390, 420, "Workspace actions", "Start TikTok Login Kit,\nprepare draft notes, and create the upload.")
     round_rect(draw, (548, 228, 1118, 540), 24, fill=(255, 255, 255, 232), outline=LINE, width=1)
-    draw.text((574, 256), "Current configuration", font=font(22, bold=True), fill=TEXT)
+    draw.text((574, 256), "Workspace details", font=font(22, bold=True), fill=TEXT)
     pill(draw, 574, 300, "Login Kit")
     pill(draw, 700, 300, "Content Posting API")
     pill(draw, 920, 300, "video.upload")
-    draw.text((574, 360), "Sample video preview and worker health are shown on the page.", font=font(17), fill=MUTED)
-    draw.text((574, 404), "The reviewer can move here from the public website or review walkthrough.", font=font(17), fill=MUTED)
-    annotate(draw, "Step 2", ["The reviewer opens the dedicated app page", "and starts TikTok authorization."])
+    draw.text((574, 360), "Connected creator, draft note, and workflow video are shown on the page.", font=font(17), fill=MUTED)
+    draw.text((574, 404), "Creators move here from the public website or product tour.", font=font(17), fill=MUTED)
+    annotate(draw, "Step 2", ["The creator opens the workspace", "and starts TikTok authorization."])
     return img
 
 
 def slide_session() -> Image.Image:
     img = base_canvas()
     draw = ImageDraw.Draw(img)
-    browser(draw, "Connected TikTok session", "https://1125haruki.github.io/tiktok-short-video-publisher-site/demo.html?connected=1")
+    browser(draw, "Connected creator session", "https://1125haruki.github.io/tiktok-short-video-publisher-site/workspace.html?connected=1")
     round_rect(draw, (96, 228, 1118, 276), 18, fill=(233, 245, 239, 255))
     draw.text((118, 242), "TikTok connected: sandbox_creator", font=font(20, bold=True), fill=ACCENT)
-    draw.text((96, 302), "After the callback, the app checks the current session and renders the account state.", font=font(17), fill=MUTED)
+    draw.text((96, 302), "After the callback, the workspace checks the session and keeps the creator visible.", font=font(17), fill=MUTED)
     code_block(
         draw,
         96,
@@ -152,24 +152,24 @@ def slide_session() -> Image.Image:
             "}",
         ],
     )
-    metric_card(draw, 630, 350, 436, "Session inspection", "The JSON panel confirms the connected account\nand keeps the review flow transparent.")
-    annotate(draw, "Step 3", ["The app returns from Login Kit,", "then confirms the connected session."])
+    metric_card(draw, 630, 350, 436, "Session inspection", "The JSON panel confirms the connected account\nand keeps the workspace transparent.")
+    annotate(draw, "Step 3", ["The workspace returns from Login Kit,", "then confirms the connected creator."])
     return img
 
 
 def slide_upload() -> Image.Image:
     img = base_canvas()
     draw = ImageDraw.Draw(img)
-    browser(draw, "Create TikTok upload draft", "https://1125haruki.github.io/tiktok-short-video-publisher-site/demo.html")
-    draw.text((96, 228), "Upload Draft", font=font(28, bold=True), fill=TEXT)
-    draw.text((96, 268), "The public MP4 URL is submitted to the Content Posting Upload API.", font=font(17), fill=MUTED)
+    browser(draw, "Prepare and create TikTok draft upload", "https://1125haruki.github.io/tiktok-short-video-publisher-site/workspace.html")
+    draw.text((96, 228), "Draft Setup", font=font(28, bold=True), fill=TEXT)
+    draw.text((96, 268), "The workspace prepares the source video and internal note before the API request.", font=font(17), fill=MUTED)
     draw.text((96, 318), "Public MP4 URL", font=font(16, bold=True), fill=TEXT)
     round_rect(draw, (96, 346, 700, 388), 18, fill=(255, 255, 255, 255), outline=LINE, width=1)
-    draw.text((114, 359), "https://1125haruki.github.io/.../tiktok-app-review-remotion.mp4", font=font(15), fill=MUTED)
-    button(draw, 96, 412, 220, "Create Upload Draft", primary=True)
-    draw.text((96, 472), "Publish ID", font=font(16, bold=True), fill=TEXT)
-    round_rect(draw, (96, 500, 520, 542), 18, fill=(255, 255, 255, 255), outline=LINE, width=1)
-    draw.text((114, 513), "v_pub_91d0b8f_example", font=font(15), fill=MUTED)
+    draw.text((114, 359), "https://1125haruki.github.io/.../short-video-publisher-product-tour.mp4", font=font(15), fill=MUTED)
+    draw.text((96, 408), "Prepared note", font=font(16, bold=True), fill=TEXT)
+    round_rect(draw, (96, 436, 520, 490), 18, fill=(255, 255, 255, 255), outline=LINE, width=1)
+    draw.text((114, 449), "Final text is confirmed in the TikTok inbox review step.", font=font(15), fill=MUTED)
+    button(draw, 96, 516, 220, "Create Upload Draft", primary=True)
     code_block(
         draw,
         736,
@@ -184,14 +184,14 @@ def slide_upload() -> Image.Image:
             "}",
         ],
     )
-    annotate(draw, "Step 4", ["The app creates a draft upload request", "and returns a publish ID."])
+    annotate(draw, "Step 4", ["The workspace creates the draft upload request", "and returns a publish ID."])
     return img
 
 
 def slide_status() -> Image.Image:
     img = base_canvas()
     draw = ImageDraw.Draw(img)
-    browser(draw, "Publish status and final TikTok review", "https://1125haruki.github.io/tiktok-short-video-publisher-site/review.html")
+    browser(draw, "Publish status and TikTok inbox review", "https://1125haruki.github.io/tiktok-short-video-publisher-site/tour.html")
     code_block(
         draw,
         96,
@@ -208,9 +208,10 @@ def slide_status() -> Image.Image:
     )
     metric_card(draw, 592, 238, 474, "Status check", "The app can inspect the publish status using the\nreturned publish ID.")
     metric_card(draw, 592, 368, 474, "Final creator review", "The current production scope stops at the draft stage.\nThe creator completes the final review in TikTok.")
-    pill(draw, 592, 506, "Mockup demo accepted")
-    pill(draw, 782, 506, "Live web flow available")
-    annotate(draw, "Step 5", ["The end-to-end path is visible:", "public website, live app console, draft upload, and final TikTok review."])
+    pill(draw, 592, 506, "Public website")
+    pill(draw, 756, 506, "Workspace")
+    pill(draw, 904, 506, "TikTok inbox")
+    annotate(draw, "Step 5", ["The full path is visible:", "public website, workspace, draft upload, and TikTok final review."])
     return img
 
 
