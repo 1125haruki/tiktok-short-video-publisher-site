@@ -1,17 +1,19 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Short Video Publisher</title>
+    <title>Short Video Publisher | TikTok Login and Upload Review</title>
     <style>
       :root {
-        --bg: #f4f0e8;
-        --fg: #1d1b18;
-        --muted: #6e665d;
-        --line: #d9cfbf;
-        --card: rgba(255, 252, 246, 0.86);
+        --bg: #f4efe6;
+        --fg: #1f1b16;
+        --muted: #6f675f;
+        --line: #d8ccbb;
+        --card: rgba(255, 252, 246, 0.92);
         --accent: #0d7c66;
+        --accent-2: #c47e3c;
+        --danger: #c2410c;
       }
       * {
         box-sizing: border-box;
@@ -21,22 +23,24 @@
         font-family: "Hiragino Sans", "Yu Gothic", sans-serif;
         color: var(--fg);
         background:
-          radial-gradient(circle at top left, rgba(13, 124, 102, 0.18), transparent 36%),
-          radial-gradient(circle at bottom right, rgba(196, 126, 60, 0.14), transparent 30%),
-          linear-gradient(180deg, #f7f3ea, #eae2d2);
-        min-height: 100vh;
+          radial-gradient(circle at top left, rgba(13, 124, 102, 0.15), transparent 28%),
+          radial-gradient(circle at bottom right, rgba(196, 126, 60, 0.16), transparent 32%),
+          linear-gradient(180deg, #f7f3ea, #e8dfcf);
       }
       main {
-        max-width: 920px;
+        max-width: 1080px;
         margin: 0 auto;
-        padding: 48px 20px 80px;
+        padding: 42px 18px 72px;
+      }
+      .hero,
+      .card {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 24px;
+        backdrop-filter: blur(8px);
       }
       .hero {
         padding: 28px;
-        border: 1px solid var(--line);
-        border-radius: 24px;
-        background: var(--card);
-        backdrop-filter: blur(8px);
       }
       .eyebrow {
         color: var(--accent);
@@ -45,48 +49,174 @@
         text-transform: uppercase;
         margin-bottom: 10px;
       }
+      h1,
+      h2,
+      h3 {
+        margin: 0;
+      }
       h1 {
-        margin: 0 0 14px;
-        font-size: clamp(34px, 5vw, 56px);
-        line-height: 1.05;
+        font-size: clamp(32px, 5vw, 52px);
+        line-height: 1.02;
+        margin-bottom: 14px;
+      }
+      h2 {
+        margin-bottom: 10px;
       }
       p {
         margin: 0;
-        line-height: 1.75;
-      }
-      .grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: 16px;
-        margin-top: 18px;
-      }
-      .card {
-        background: rgba(255, 255, 255, 0.72);
-        border: 1px solid var(--line);
-        border-radius: 18px;
-        padding: 18px;
-      }
-      .card h2 {
-        margin: 0 0 8px;
-        font-size: 18px;
+        line-height: 1.7;
       }
       .muted {
         color: var(--muted);
       }
-      ul {
-        margin: 12px 0 0;
-        padding-left: 20px;
+      .grid {
+        display: grid;
+        grid-template-columns: 1.3fr 1fr;
+        gap: 16px;
+        margin-top: 18px;
       }
-      li {
+      .stack {
+        display: grid;
+        gap: 16px;
+      }
+      .card {
+        padding: 22px;
+      }
+      .steps {
+        display: grid;
+        gap: 12px;
+        margin-top: 18px;
+      }
+      .step {
+        display: grid;
+        grid-template-columns: 34px 1fr;
+        gap: 12px;
+        align-items: start;
+      }
+      .step strong {
+        display: block;
+        margin-bottom: 4px;
+      }
+      .badge {
+        width: 34px;
+        height: 34px;
+        border-radius: 999px;
+        display: grid;
+        place-items: center;
+        background: rgba(13, 124, 102, 0.1);
+        color: var(--accent);
+        font-weight: 700;
+      }
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 18px;
+      }
+      button,
+      .button-link {
+        appearance: none;
+        border: none;
+        border-radius: 999px;
+        padding: 13px 18px;
+        font: inherit;
+        cursor: pointer;
+        text-decoration: none;
+      }
+      .button-primary {
+        background: var(--accent);
+        color: #fff;
+      }
+      .button-secondary {
+        background: rgba(13, 124, 102, 0.08);
+        color: var(--accent);
+      }
+      .button-tertiary {
+        background: rgba(196, 126, 60, 0.12);
+        color: #7a4b16;
+      }
+      label {
+        display: block;
+        font-weight: 600;
         margin-bottom: 8px;
       }
+      input {
+        width: 100%;
+        padding: 12px 14px;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        font: inherit;
+        background: #fffdfa;
+      }
+      code,
+      pre {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      }
+      pre {
+        margin: 0;
+        padding: 16px;
+        border-radius: 16px;
+        background: #181818;
+        color: #f7f7f7;
+        overflow: auto;
+        min-height: 160px;
+      }
+      .status-line {
+        margin-top: 12px;
+        padding: 12px 14px;
+        border-radius: 14px;
+        background: rgba(13, 124, 102, 0.08);
+        color: var(--accent);
+        font-weight: 600;
+      }
+      .status-line.error {
+        background: rgba(194, 65, 12, 0.08);
+        color: var(--danger);
+      }
+      .meta {
+        display: grid;
+        gap: 10px;
+        margin-top: 14px;
+      }
+      .meta-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+      }
+      .pill {
+        display: inline-flex;
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: rgba(13, 124, 102, 0.08);
+        color: var(--accent);
+        font-size: 13px;
+      }
+      .review-note {
+        margin-top: 18px;
+        padding: 16px 18px;
+        border: 1px dashed rgba(13, 124, 102, 0.28);
+        border-radius: 18px;
+        background: rgba(13, 124, 102, 0.04);
+      }
+      video {
+        width: 100%;
+        border-radius: 18px;
+        border: 1px solid var(--line);
+        background: #000;
+      }
       footer {
-        margin-top: 24px;
+        margin-top: 18px;
         color: var(--muted);
         font-size: 14px;
       }
       a {
         color: inherit;
+      }
+      @media (max-width: 840px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
       }
     </style>
   </head>
@@ -94,45 +224,227 @@
     <main>
       <section class="hero">
         <div class="eyebrow">Short Video Publisher</div>
-        <h1>Original short videos,<br />prepared once and published cleanly.</h1>
+        <h1>Connect a TikTok account, inspect the session, and send an upload draft from this website.</h1>
         <p>
-          Short Video Publisher is a lightweight publishing support app for creators.
-          It prepares original short-form video assets, captions, thumbnails, and scheduling metadata,
-          then connects authorized social accounts to streamline delivery.
+          This root website URL is the live review page for the TikTok Login Kit and Content Posting API
+          integration. Reviewers can start login from the button below, confirm the connected session, and
+          initialize a draft upload with a public MP4 URL.
         </p>
-        <div class="grid">
-          <article class="card">
-            <h2>What It Does</h2>
-            <p class="muted">
-              Helps creators send original videos to connected platforms with clear account selection,
-              editable metadata, and posting support.
-            </p>
-          </article>
-          <article class="card">
-            <h2>Current TikTok Scope</h2>
-            <p class="muted">
-              Initial TikTok integration is designed around the Content Posting Upload API.
-              Users review and complete the final publish flow where required.
-            </p>
-          </article>
-          <article class="card">
-            <h2>Contact</h2>
-            <p class="muted">
-              Public support runs through GitHub Issues.<br />
-              <a href="https://github.com/1125haruki/tiktok-short-video-publisher-site/issues">Support / Contact</a>
-            </p>
-          </article>
+        <div class="steps">
+          <div class="step">
+            <div class="badge">1</div>
+            <div>
+              <strong>Start TikTok Login</strong>
+              <p class="muted">Use the main button below to open TikTok OAuth and authorize the app.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="badge">2</div>
+            <div>
+              <strong>Inspect the connected session</strong>
+              <p class="muted">Fetch the current TikTok account state and basic profile fields.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="badge">3</div>
+            <div>
+              <strong>Create a Content Posting draft</strong>
+              <p class="muted">Initialize a TikTok upload draft from the sample public MP4 URL.</p>
+            </div>
+          </div>
+        </div>
+        <div class="actions">
+          <a class="button-link button-primary" id="connectButton" href="#">Connect TikTok</a>
+          <button class="button-secondary" id="refreshSessionButton" type="button">Check Session</button>
+          <a class="button-link button-tertiary" href="./privacy-policy.html">Privacy Policy</a>
+        </div>
+        <div class="review-note">
+          <strong>Reviewer note:</strong>
+          <p class="muted">
+            This page is intentionally the same URL submitted as the Website URL so the full login and posting
+            flow can be accessed directly without navigating elsewhere.
+          </p>
         </div>
       </section>
 
-      <footer>
-        Legal pages:
-        <a href="./privacy-policy.html">Privacy Policy</a>
-        /
-        <a href="./terms-of-service.html">Terms of Service</a>
-        /
-        <a href="./demo.html">TikTok Demo</a>
-      </footer>
+      <section class="grid">
+        <div class="stack">
+          <article class="card">
+            <h2>Upload Draft</h2>
+            <p class="muted">
+              Submit the sample public MP4 URL to the TikTok Content Posting Upload API. Final posting review
+              remains on the TikTok side where required.
+            </p>
+            <div class="meta">
+              <div>
+                <label for="videoUrl">Public MP4 URL</label>
+                <input id="videoUrl" type="url" />
+              </div>
+              <div class="actions">
+                <button class="button-primary" id="uploadDraftButton" type="button">Create Upload Draft</button>
+                <button class="button-secondary" id="checkStatusButton" type="button">Check Publish Status</button>
+              </div>
+              <div>
+                <label for="publishId">Publish ID</label>
+                <input id="publishId" type="text" placeholder="Filled after upload draft creation" />
+              </div>
+            </div>
+            <div class="status-line" id="statusLine">
+              Ready. Start by clicking "Connect TikTok" on this page.
+            </div>
+          </article>
+
+          <article class="card">
+            <h2>Live Response</h2>
+            <p class="muted">Raw JSON responses from the Worker are shown below for review.</p>
+            <pre id="jsonOutput">{
+  "ready": true
+}</pre>
+          </article>
+        </div>
+
+        <div class="stack">
+          <article class="card">
+            <h2>Sample Video</h2>
+            <p class="muted">
+              This public MP4 is provided for the review flow and is prefilled in the upload draft form.
+            </p>
+            <video controls preload="metadata">
+              <source src="./assets/tiktok-app-review-remotion.mp4" type="video/mp4" />
+            </video>
+          </article>
+
+          <article class="card">
+            <h2>Current Configuration</h2>
+            <div class="meta-row">
+              <span class="pill">Login Kit</span>
+              <span class="pill">Content Posting API</span>
+              <span class="pill">video.upload</span>
+            </div>
+            <footer>
+              Worker health:
+              <a href="https://tiktok-short-video-publisher-auth.chillsabo1125.workers.dev/tiktok/health">
+                /tiktok/health
+              </a>
+              <br />
+              Legal:
+              <a href="./terms-of-service.html">Terms of Service</a>
+              /
+              <a href="./demo.html">Alternate Demo Page</a>
+            </footer>
+          </article>
+        </div>
+      </section>
     </main>
+
+    <script>
+      const workerBase = "https://tiktok-short-video-publisher-auth.chillsabo1125.workers.dev";
+      const sampleVideoUrl =
+        "https://1125haruki.github.io/tiktok-short-video-publisher-site/assets/tiktok-app-review-remotion.mp4";
+
+      const connectButton = document.getElementById("connectButton");
+      const refreshSessionButton = document.getElementById("refreshSessionButton");
+      const uploadDraftButton = document.getElementById("uploadDraftButton");
+      const checkStatusButton = document.getElementById("checkStatusButton");
+      const videoUrlInput = document.getElementById("videoUrl");
+      const publishIdInput = document.getElementById("publishId");
+      const statusLine = document.getElementById("statusLine");
+      const jsonOutput = document.getElementById("jsonOutput");
+
+      videoUrlInput.value = sampleVideoUrl;
+      connectButton.href = `${workerBase}/tiktok/connect`;
+
+      function setStatus(message, isError = false) {
+        statusLine.textContent = message;
+        statusLine.classList.toggle("error", isError);
+      }
+
+      function showJson(data) {
+        jsonOutput.textContent = JSON.stringify(data, null, 2);
+      }
+
+      async function callJson(path, options = {}) {
+        const response = await fetch(`${workerBase}${path}`, {
+          credentials: "include",
+          ...options,
+          headers: {
+            "Content-Type": "application/json",
+            ...(options.headers || {}),
+          },
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          throw new Error(data.message || data.error || `HTTP ${response.status}`);
+        }
+        return data;
+      }
+
+      async function refreshSession() {
+        setStatus("Checking connected TikTok session.");
+        try {
+          const data = await callJson("/tiktok/session");
+          showJson(data);
+          if (data.connected) {
+            const name = data.user?.display_name || data.user?.open_id || "connected";
+            setStatus(`TikTok connected: ${name}`);
+          } else {
+            setStatus("No TikTok account is connected yet. Start login from this page.", true);
+          }
+        } catch (error) {
+          showJson({ error: String(error.message || error) });
+          setStatus(`Failed to load session: ${error.message || error}`, true);
+        }
+      }
+
+      async function uploadDraft() {
+        const videoUrl = videoUrlInput.value.trim();
+        if (!videoUrl) {
+          setStatus("A public MP4 URL is required.", true);
+          return;
+        }
+
+        setStatus("Creating TikTok upload draft.");
+        try {
+          const data = await callJson("/tiktok/upload-draft", {
+            method: "POST",
+            body: JSON.stringify({ videoUrl }),
+          });
+          if (data.publishId) {
+            publishIdInput.value = data.publishId;
+          }
+          showJson(data);
+          setStatus("Upload draft request created. Use publish status to inspect progress.");
+        } catch (error) {
+          showJson({ error: String(error.message || error) });
+          setStatus(`Failed to create upload draft: ${error.message || error}`, true);
+        }
+      }
+
+      async function checkStatus() {
+        const publishId = publishIdInput.value.trim();
+        if (!publishId) {
+          setStatus("Enter or generate a publish ID first.", true);
+          return;
+        }
+
+        setStatus("Fetching publish status.");
+        try {
+          const data = await callJson(`/tiktok/status?publish_id=${encodeURIComponent(publishId)}`);
+          showJson(data);
+          setStatus("Publish status loaded.");
+        } catch (error) {
+          showJson({ error: String(error.message || error) });
+          setStatus(`Failed to fetch publish status: ${error.message || error}`, true);
+        }
+      }
+
+      refreshSessionButton.addEventListener("click", refreshSession);
+      uploadDraftButton.addEventListener("click", uploadDraft);
+      checkStatusButton.addEventListener("click", checkStatus);
+
+      if (new URLSearchParams(window.location.search).get("connected")) {
+        refreshSession();
+      }
+    </script>
   </body>
 </html>

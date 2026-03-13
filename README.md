@@ -15,6 +15,10 @@ TikTok Developers 申請用の最小公開セットです。
 - `privacy-policy.html`
 - `terms-of-service.html`
 - `callback.html`
+- `demo.html`
+
+`index.html` は TikTok 審査向けの実利用ページとして使います。`Website URL` を開くと、その場で
+`Connect TikTok` から Login Kit を開始し、session 確認と upload draft 初期化まで進められる構成です。
 
 ## TikTok Developers に登録する URL
 
@@ -43,3 +47,4 @@ TikTok Developers 申請用の最小公開セットです。
 - GitHub Pages は無料
 - Cloudflare Workers も小規模なら無料枠で始めやすい
 - `Redirect URI` は静的ページではなく server-side endpoint が必要
+- `APP_RETURN_URL` は `Website URL` と同じルートページに戻すと、審査時の導線がぶれにくい
