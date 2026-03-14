@@ -17,6 +17,7 @@ name = "tiktok-short-video-publisher-auth-sandbox"
 workers_dev = true
 
 [env.sandbox.vars]
+TIKTOK_CLIENT_KEY = "sbaw1gtel1wkhv60c3"
 TIKTOK_REDIRECT_URI = "https://tiktok-short-video-publisher-auth-sandbox.chillsabo1125.workers.dev/tiktok/callback"
 TIKTOK_SCOPE = "user.info.basic,video.upload,video.publish"
 ALLOWED_ORIGIN = "https://1125haruki.github.io"
