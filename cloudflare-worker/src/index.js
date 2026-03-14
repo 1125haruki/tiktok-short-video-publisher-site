@@ -43,7 +43,11 @@ function withCors(request, env, response) {
 function preflight(request, env) {
   const response = new Response(null, { status: 204 });
   response.headers.set("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
-  response.headers.set("Access-Control-Allow-Headers", "Content-Type");
+  response.headers.set(
+    "Access-Control-Allow-Headers",
+    request.headers.get("Access-Control-Request-Headers") ||
+      "Content-Type, X-TikTok-Access-Token, X-TikTok-Scope, X-TikTok-Open-Id"
+  );
   return withCors(request, env, response);
 }
 
@@ -125,6 +129,17 @@ function hasScope(scopeValue, requiredScope) {
   return parseScopeList(scopeValue).includes(requiredScope);
 }
 
+function parseHeaderSession(request) {
+  const accessToken = request.headers.get("X-TikTok-Access-Token") || "";
+  if (!accessToken) return null;
+  return {
+    accessToken,
+    scope: request.headers.get("X-TikTok-Scope") || "",
+    openId: request.headers.get("X-TikTok-Open-Id") || "",
+    source: "header",
+  };
+}
+
 function createTikTokError(payload, fallback, status = 400) {
   const err = new Error(
     payload?.error?.message ||
@@ -145,6 +160,11 @@ function assertTikTokOk(response, payload, fallback) {
 }
 
 function requireAccessToken(request, env) {
+  const headerSession = parseHeaderSession(request);
+  if (headerSession?.accessToken) {
+    return { ok: true, session: headerSession };
+  }
+
   const cookies = parseCookies(request);
   if (!cookies.tt_access_token) {
     return {
@@ -156,11 +176,19 @@ function requireAccessToken(request, env) {
       ),
     };
   }
-  return { ok: true, cookies };
+  return {
+    ok: true,
+    session: {
+      accessToken: cookies.tt_access_token,
+      scope: cookies.tt_scope || "",
+      openId: cookies.tt_open_id || "",
+      source: "cookie",
+    },
+  };
 }
 
-function requireScope(request, env, cookies, scope) {
-  if (hasScope(cookies.tt_scope || "", scope)) {
+function requireScope(request, env, session, scope) {
+  if (hasScope(session.scope || "", scope)) {
     return { ok: true };
   }
   return {
@@ -173,7 +201,7 @@ function requireScope(request, env, cookies, scope) {
           error: "missing_scope",
           message: `Reconnect TikTok with the ${scope} scope before using this action.`,
           requiredScope: scope,
-          currentScope: parseScopeList(cookies.tt_scope || ""),
+          currentScope: parseScopeList(session.scope || ""),
         },
         { status: 403 }
       )
@@ -349,6 +377,23 @@ async function forwardTokenBundle(bundle, env) {
   return { ok: true, status: response.status };
 }
 
+function buildReturnUrl(env, tokenBundle) {
+  const baseReturnUrl = env.APP_RETURN_URL
+    ? `${env.APP_RETURN_URL}${env.APP_RETURN_URL.includes("?") ? "&" : "?"}connected=1`
+    : env.ALLOWED_ORIGIN || "/";
+
+  if (env.CLIENT_SESSION_BRIDGE !== "fragment") {
+    return baseReturnUrl;
+  }
+
+  const fragment = new URLSearchParams({
+    tt_access_token: tokenBundle.access_token || "",
+    tt_scope: tokenBundle.scope || "",
+    tt_open_id: tokenBundle.open_id || "",
+  });
+  return `${baseReturnUrl}#${fragment.toString()}`;
+}
+
 async function handleCallback(request, env) {
   const url = new URL(request.url);
   const code = url.searchParams.get("code");
@@ -382,9 +427,7 @@ async function handleCallback(request, env) {
     if (env.TOKEN_SINK_URL) {
       sinkResult = await forwardTokenBundle(tokenBundle, env);
     }
-    const returnUrl = env.APP_RETURN_URL
-      ? `${env.APP_RETURN_URL}${env.APP_RETURN_URL.includes("?") ? "&" : "?"}connected=1`
-      : env.ALLOWED_ORIGIN || "/";
+    const returnUrl = buildReturnUrl(env, tokenBundle);
 
     const response = html(
       `<h1>TikTok authorization succeeded</h1>
@@ -432,8 +475,8 @@ async function handleCallback(request, env) {
 }
 
 async function handleSession(request, env) {
-  const cookies = parseCookies(request);
-  if (!cookies.tt_access_token) {
+  const access = requireAccessToken(request, env);
+  if (!access.ok) {
     return withCors(
       request,
       env,
@@ -444,14 +487,14 @@ async function handleSession(request, env) {
   }
 
   try {
-    const user = await fetchUserInfo(cookies.tt_access_token);
+    const user = await fetchUserInfo(access.session.accessToken);
     return withCors(
       request,
       env,
       json({
         connected: true,
-        scope: cookies.tt_scope || "",
-        scopeList: parseScopeList(cookies.tt_scope || ""),
+        scope: access.session.scope || "",
+        scopeList: parseScopeList(access.session.scope || ""),
         user,
       })
     );
@@ -479,11 +522,11 @@ async function handleCreatorInfo(request, env) {
   const access = requireAccessToken(request, env);
   if (!access.ok) return access.response;
 
-  const scopeCheck = requireScope(request, env, access.cookies, "video.publish");
+  const scopeCheck = requireScope(request, env, access.session, "video.publish");
   if (!scopeCheck.ok) return scopeCheck.response;
 
   try {
-    const data = await queryCreatorInfo(access.cookies.tt_access_token);
+    const data = await queryCreatorInfo(access.session.accessToken);
     return withCors(request, env, json({ ok: true, data }));
   } catch (err) {
     return withCors(
@@ -515,7 +558,7 @@ async function handleUploadDraft(request, env) {
   }
 
   try {
-    const data = await uploadDraft(access.cookies.tt_access_token, videoUrl);
+    const data = await uploadDraft(access.session.accessToken, videoUrl);
     return withCors(
       request,
       env,
@@ -544,7 +587,7 @@ async function handleDirectPost(request, env) {
   const access = requireAccessToken(request, env);
   if (!access.ok) return access.response;
 
-  const scopeCheck = requireScope(request, env, access.cookies, "video.publish");
+  const scopeCheck = requireScope(request, env, access.session, "video.publish");
   if (!scopeCheck.ok) return scopeCheck.response;
 
   const body = await request.json().catch(() => ({}));
@@ -564,7 +607,7 @@ async function handleDirectPost(request, env) {
   }
 
   try {
-    const data = await createDirectPost(access.cookies.tt_access_token, body);
+    const data = await createDirectPost(access.session.accessToken, body);
     return withCors(
       request,
       env,
@@ -604,7 +647,7 @@ async function handleStatus(request, env) {
   }
 
   try {
-    const data = await fetchPublishStatus(access.cookies.tt_access_token, publishId);
+    const data = await fetchPublishStatus(access.session.accessToken, publishId);
     return withCors(request, env, json({ ok: true, data }));
   } catch (err) {
     return withCors(
@@ -652,6 +695,7 @@ export default {
               directPost: hasScope(env.TIKTOK_SCOPE || "", "video.publish"),
               status: true,
             },
+            sessionBridge: env.CLIENT_SESSION_BRIDGE || "cookie",
           })
         );
       }

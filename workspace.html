@@ -620,6 +620,7 @@
         sessionScope: "",
         creatorInfo: null,
         detectedDurationSec: null,
+        clientSession: null,
       };
 
       const connectButton = document.getElementById("connectButton");
@@ -667,10 +668,50 @@
       const previewVideo = document.getElementById("previewVideo");
       const assetPreview = document.getElementById("assetPreview");
 
+      const clientSessionStorageKey = `ttClientSession:${workspaceMode}`;
+
       videoUrlInput.value = sampleVideoUrl;
       postTitleInput.value = "AI cat daily story | episode 1";
       internalNoteInput.value = "Direct Post review mode is prepared while Upload API remains available.";
       connectButton.href = `${workerBase}/tiktok/connect`;
+
+      function persistClientSession(clientSession) {
+        state.clientSession = clientSession;
+        if (!clientSession?.accessToken) {
+          sessionStorage.removeItem(clientSessionStorageKey);
+          return;
+        }
+        sessionStorage.setItem(clientSessionStorageKey, JSON.stringify(clientSession));
+      }
+
+      function restoreClientSession() {
+        const raw = sessionStorage.getItem(clientSessionStorageKey);
+        if (!raw) return null;
+        try {
+          const parsed = JSON.parse(raw);
+          return parsed?.accessToken ? parsed : null;
+        } catch (_error) {
+          sessionStorage.removeItem(clientSessionStorageKey);
+          return null;
+        }
+      }
+
+      function absorbClientSessionFromHash() {
+        const hashValue = window.location.hash.replace(/^#/, "");
+        if (!hashValue) return;
+        const hashParams = new URLSearchParams(hashValue);
+        const accessToken = hashParams.get("tt_access_token");
+        if (!accessToken) return;
+        persistClientSession({
+          accessToken,
+          scope: hashParams.get("tt_scope") || "",
+          openId: hashParams.get("tt_open_id") || "",
+        });
+        history.replaceState(null, "", `${window.location.pathname}${window.location.search}`);
+      }
+
+      absorbClientSessionFromHash();
+      persistClientSession(restoreClientSession());
 
       function parseScopes(scopeText) {
         return (scopeText || "")
@@ -850,11 +891,19 @@
       }
 
       async function callJson(path, options = {}) {
+        const extraHeaders = state.clientSession?.accessToken
+          ? {
+              "X-TikTok-Access-Token": state.clientSession.accessToken,
+              "X-TikTok-Scope": state.clientSession.scope || "",
+              "X-TikTok-Open-Id": state.clientSession.openId || "",
+            }
+          : {};
         const response = await fetch(`${workerBase}${path}`, {
           credentials: "include",
           ...options,
           headers: {
             "Content-Type": "application/json",
+            ...extraHeaders,
             ...(options.headers || {}),
           },
         });
