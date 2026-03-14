@@ -1,6 +1,8 @@
 const AUTH_URL = "https://www.tiktok.com/v2/auth/authorize/";
 const TOKEN_URL = "https://open.tiktokapis.com/v2/oauth/token/";
 const USER_INFO_URL = "https://open.tiktokapis.com/v2/user/info/?fields=open_id,display_name,avatar_url";
+const CREATOR_INFO_URL = "https://open.tiktokapis.com/v2/post/publish/creator_info/query/";
+const DIRECT_POST_URL = "https://open.tiktokapis.com/v2/post/publish/video/init/";
 const UPLOAD_INIT_URL = "https://open.tiktokapis.com/v2/post/publish/inbox/video/init/";
 const STATUS_FETCH_URL = "https://open.tiktokapis.com/v2/post/publish/status/fetch/";
 
@@ -49,12 +51,6 @@ function base64Url(bytes) {
   let binary = "";
   for (const byte of bytes) binary += String.fromCharCode(byte);
   return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
-}
-
-async function sha256Hex(input) {
-  const bytes = new TextEncoder().encode(input);
-  const digest = await crypto.subtle.digest("SHA-256", bytes);
-  return [...new Uint8Array(digest)].map((v) => v.toString(16).padStart(2, "0")).join("");
 }
 
 function randomToken(byteLength = 24) {
@@ -118,6 +114,73 @@ function clearCookie(name) {
   return `${name}=; Path=/tiktok; Max-Age=0; HttpOnly; Secure; SameSite=None`;
 }
 
+function parseScopeList(scopeValue = "") {
+  return scopeValue
+    .split(",")
+    .map((value) => value.trim())
+    .filter(Boolean);
+}
+
+function hasScope(scopeValue, requiredScope) {
+  return parseScopeList(scopeValue).includes(requiredScope);
+}
+
+function createTikTokError(payload, fallback, status = 400) {
+  const err = new Error(
+    payload?.error?.message ||
+      payload?.error_description ||
+      payload?.message ||
+      payload?.error ||
+      fallback
+  );
+  err.code = payload?.error?.code || payload?.error || "tiktok_error";
+  err.status = status;
+  return err;
+}
+
+function assertTikTokOk(response, payload, fallback) {
+  if (!response.ok || payload?.error?.code !== "ok") {
+    throw createTikTokError(payload, fallback, response.status);
+  }
+}
+
+function requireAccessToken(request, env) {
+  const cookies = parseCookies(request);
+  if (!cookies.tt_access_token) {
+    return {
+      ok: false,
+      response: withCors(
+        request,
+        env,
+        json({ error: "not_connected", message: "Connect TikTok first." }, { status: 401 })
+      ),
+    };
+  }
+  return { ok: true, cookies };
+}
+
+function requireScope(request, env, cookies, scope) {
+  if (hasScope(cookies.tt_scope || "", scope)) {
+    return { ok: true };
+  }
+  return {
+    ok: false,
+    response: withCors(
+      request,
+      env,
+      json(
+        {
+          error: "missing_scope",
+          message: `Reconnect TikTok with the ${scope} scope before using this action.`,
+          requiredScope: scope,
+          currentScope: parseScopeList(cookies.tt_scope || ""),
+        },
+        { status: 403 }
+      )
+    ),
+  };
+}
+
 async function fetchUserInfo(accessToken) {
   const response = await fetch(USER_INFO_URL, {
     headers: {
@@ -125,10 +188,22 @@ async function fetchUserInfo(accessToken) {
     },
   });
   const payload = await response.json().catch(() => ({}));
-  if (!response.ok || payload?.error?.code !== "ok") {
-    throw new Error(payload?.error?.message || "User info request failed");
-  }
+  assertTikTokOk(response, payload, "User info request failed");
   return payload.data?.user || null;
+}
+
+async function queryCreatorInfo(accessToken) {
+  const response = await fetch(CREATOR_INFO_URL, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json; charset=UTF-8",
+    },
+    body: JSON.stringify({}),
+  });
+  const payload = await response.json().catch(() => ({}));
+  assertTikTokOk(response, payload, "Creator info request failed");
+  return payload.data || null;
 }
 
 async function uploadDraft(accessToken, videoUrl) {
@@ -146,10 +221,49 @@ async function uploadDraft(accessToken, videoUrl) {
     }),
   });
   const payload = await response.json().catch(() => ({}));
-  if (!response.ok || payload?.error?.code !== "ok") {
-    throw new Error(payload?.error?.message || payload?.error?.code || "Upload init failed");
+  assertTikTokOk(response, payload, "Upload init failed");
+  return payload.data || null;
+}
+
+async function createDirectPost(accessToken, requestBody) {
+  const body = {
+    post_info: {
+      privacy_level: requestBody.privacyLevel,
+      disable_comment: !Boolean(requestBody.allowComment),
+      disable_duet: !Boolean(requestBody.allowDuet),
+      disable_stitch: !Boolean(requestBody.allowStitch),
+      brand_content_toggle: Boolean(requestBody.brandContentToggle),
+      brand_organic_toggle: Boolean(requestBody.brandOrganicToggle),
+      is_aigc: Boolean(requestBody.isAigc),
+    },
+    source_info: {
+      source: "PULL_FROM_URL",
+      video_url: requestBody.videoUrl,
+    },
+  };
+
+  if (requestBody.title) {
+    body.post_info.title = requestBody.title;
   }
-  return payload.data;
+
+  if (
+    Number.isFinite(requestBody.videoCoverTimestampMs) &&
+    requestBody.videoCoverTimestampMs >= 0
+  ) {
+    body.post_info.video_cover_timestamp_ms = requestBody.videoCoverTimestampMs;
+  }
+
+  const response = await fetch(DIRECT_POST_URL, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json; charset=UTF-8",
+    },
+    body: JSON.stringify(body),
+  });
+  const payload = await response.json().catch(() => ({}));
+  assertTikTokOk(response, payload, "Direct post init failed");
+  return payload.data || null;
 }
 
 async function fetchPublishStatus(accessToken, publishId) {
@@ -164,9 +278,7 @@ async function fetchPublishStatus(accessToken, publishId) {
     }),
   });
   const payload = await response.json().catch(() => ({}));
-  if (!response.ok || payload?.error?.code !== "ok") {
-    throw new Error(payload?.error?.message || payload?.error?.code || "Status fetch failed");
-  }
+  assertTikTokOk(response, payload, "Status fetch failed");
   return payload.data || null;
 }
 
@@ -209,7 +321,7 @@ async function exchangeToken(code, env) {
 
   const payload = await response.json().catch(() => ({}));
   if (!response.ok) {
-    throw new Error(payload.error_description || payload.message || "Token exchange failed");
+    throw createTikTokError(payload, "Token exchange failed", response.status);
   }
   return payload;
 }
@@ -284,23 +396,38 @@ async function handleCallback(request, env) {
          <li>refresh_token: <code>${redactedToken(tokenBundle.refresh_token) || "n/a"}</code></li>
          <li>sink: <code>${sinkResult ? "forwarded" : "not configured"}</code></li>
        </ul>
-       <p><a href="${returnUrl}">Return to the demo page</a></p>
+       <p><a href="${returnUrl}">Return to the workspace</a></p>
        <script>setTimeout(() => { location.href = ${JSON.stringify(returnUrl)}; }, 1800);</script>`,
       {
         status: 200,
       }
     );
     response.headers.append("Set-Cookie", clearCookie("tt_state_verifier"));
-    response.headers.append("Set-Cookie", cookie("tt_access_token", tokenBundle.access_token, tokenBundle.expires_in || 86400));
-    response.headers.append("Set-Cookie", cookie("tt_refresh_token", tokenBundle.refresh_token, tokenBundle.refresh_expires_in || 86400 * 30));
-    response.headers.append("Set-Cookie", cookie("tt_open_id", tokenBundle.open_id || "", tokenBundle.expires_in || 86400));
-    response.headers.append("Set-Cookie", cookie("tt_scope", tokenBundle.scope || "", tokenBundle.expires_in || 86400));
+    response.headers.append(
+      "Set-Cookie",
+      cookie("tt_access_token", tokenBundle.access_token, tokenBundle.expires_in || 86400)
+    );
+    response.headers.append(
+      "Set-Cookie",
+      cookie(
+        "tt_refresh_token",
+        tokenBundle.refresh_token,
+        tokenBundle.refresh_expires_in || 86400 * 30
+      )
+    );
+    response.headers.append(
+      "Set-Cookie",
+      cookie("tt_open_id", tokenBundle.open_id || "", tokenBundle.expires_in || 86400)
+    );
+    response.headers.append(
+      "Set-Cookie",
+      cookie("tt_scope", tokenBundle.scope || "", tokenBundle.expires_in || 86400)
+    );
     return response;
   } catch (err) {
-    return html(
-      `<h1>Token exchange failed</h1><p>${String(err.message || err)}</p>`,
-      { status: 500 }
-    );
+    return html(`<h1>Token exchange failed</h1><p>${String(err.message || err)}</p>`, {
+      status: 500,
+    });
   }
 }
 
@@ -324,6 +451,7 @@ async function handleSession(request, env) {
       json({
         connected: true,
         scope: cookies.tt_scope || "",
+        scopeList: parseScopeList(cookies.tt_scope || ""),
         user,
       })
     );
@@ -347,15 +475,34 @@ async function handleSession(request, env) {
   }
 }
 
-async function handleUploadDraft(request, env) {
-  const cookies = parseCookies(request);
-  if (!cookies.tt_access_token) {
+async function handleCreatorInfo(request, env) {
+  const access = requireAccessToken(request, env);
+  if (!access.ok) return access.response;
+
+  const scopeCheck = requireScope(request, env, access.cookies, "video.publish");
+  if (!scopeCheck.ok) return scopeCheck.response;
+
+  try {
+    const data = await queryCreatorInfo(access.cookies.tt_access_token);
+    return withCors(request, env, json({ ok: true, data }));
+  } catch (err) {
     return withCors(
       request,
       env,
-      json({ error: "not_connected", message: "Connect TikTok first." }, { status: 401 })
+      json(
+        {
+          error: err.code || "creator_info_failed",
+          message: String(err.message || err),
+        },
+        { status: err.status || 400 }
+      )
     );
   }
+}
+
+async function handleUploadDraft(request, env) {
+  const access = requireAccessToken(request, env);
+  if (!access.ok) return access.response;
 
   const body = await request.json().catch(() => ({}));
   const videoUrl = body.videoUrl;
@@ -368,12 +515,13 @@ async function handleUploadDraft(request, env) {
   }
 
   try {
-    const data = await uploadDraft(cookies.tt_access_token, videoUrl);
+    const data = await uploadDraft(access.cookies.tt_access_token, videoUrl);
     return withCors(
       request,
       env,
       json({
         ok: true,
+        mode: "upload_fallback",
         publishId: data.publish_id,
       })
     );
@@ -381,20 +529,69 @@ async function handleUploadDraft(request, env) {
     return withCors(
       request,
       env,
-      json({ error: "upload_failed", message: String(err.message || err) }, { status: 400 })
+      json(
+        {
+          error: err.code || "upload_failed",
+          message: String(err.message || err),
+        },
+        { status: err.status || 400 }
+      )
+    );
+  }
+}
+
+async function handleDirectPost(request, env) {
+  const access = requireAccessToken(request, env);
+  if (!access.ok) return access.response;
+
+  const scopeCheck = requireScope(request, env, access.cookies, "video.publish");
+  if (!scopeCheck.ok) return scopeCheck.response;
+
+  const body = await request.json().catch(() => ({}));
+  if (!body.videoUrl) {
+    return withCors(
+      request,
+      env,
+      json({ error: "missing_video_url", message: "videoUrl is required." }, { status: 400 })
+    );
+  }
+  if (!body.privacyLevel) {
+    return withCors(
+      request,
+      env,
+      json({ error: "missing_privacy_level", message: "privacyLevel is required." }, { status: 400 })
+    );
+  }
+
+  try {
+    const data = await createDirectPost(access.cookies.tt_access_token, body);
+    return withCors(
+      request,
+      env,
+      json({
+        ok: true,
+        mode: "direct_post",
+        publishId: data.publish_id,
+      })
+    );
+  } catch (err) {
+    return withCors(
+      request,
+      env,
+      json(
+        {
+          error: err.code || "direct_post_failed",
+          message: String(err.message || err),
+        },
+        { status: err.status || 400 }
+      )
     );
   }
 }
 
 async function handleStatus(request, env) {
-  const cookies = parseCookies(request);
-  if (!cookies.tt_access_token) {
-    return withCors(
-      request,
-      env,
-      json({ error: "not_connected", message: "Connect TikTok first." }, { status: 401 })
-    );
-  }
+  const access = requireAccessToken(request, env);
+  if (!access.ok) return access.response;
 
   const url = new URL(request.url);
   const publishId = url.searchParams.get("publish_id");
@@ -407,13 +604,19 @@ async function handleStatus(request, env) {
   }
 
   try {
-    const data = await fetchPublishStatus(cookies.tt_access_token, publishId);
+    const data = await fetchPublishStatus(access.cookies.tt_access_token, publishId);
     return withCors(request, env, json({ ok: true, data }));
   } catch (err) {
     return withCors(
       request,
       env,
-      json({ error: "status_failed", message: String(err.message || err) }, { status: 400 })
+      json(
+        {
+          error: err.code || "status_failed",
+          message: String(err.message || err),
+        },
+        { status: err.status || 400 }
+      )
     );
   }
 }
@@ -441,6 +644,14 @@ export default {
                 env.STATE_SECRET
             ),
             scope: env.TIKTOK_SCOPE || "video.upload",
+            scopeList: parseScopeList(env.TIKTOK_SCOPE || "video.upload"),
+            capabilities: {
+              session: true,
+              uploadDraft: true,
+              creatorInfo: hasScope(env.TIKTOK_SCOPE || "", "video.publish"),
+              directPost: hasScope(env.TIKTOK_SCOPE || "", "video.publish"),
+              status: true,
+            },
           })
         );
       }
@@ -472,6 +683,14 @@ export default {
         return handleSession(request, env);
       }
 
+      if (url.pathname === "/tiktok/creator-info" && request.method === "POST") {
+        return handleCreatorInfo(request, env);
+      }
+
+      if (url.pathname === "/tiktok/direct-post" && request.method === "POST") {
+        return handleDirectPost(request, env);
+      }
+
       if (url.pathname === "/tiktok/upload-draft" && request.method === "POST") {
         return handleUploadDraft(request, env);
       }
@@ -484,15 +703,16 @@ export default {
         `<h1>TikTok OAuth Worker</h1>
          <p>Use <code>/tiktok/connect</code> to start authorization.</p>
          <p>Use <code>/tiktok/session</code> to inspect the current connection.</p>
-         <p>Use <code>/tiktok/upload-draft</code> to initialize Upload API draft creation.</p>
-         <p>Use <code>/tiktok/health</code> to verify deployment.</p>`,
+         <p>Use <code>/tiktok/creator-info</code> to load creator posting settings for Direct Post review.</p>
+         <p>Use <code>/tiktok/direct-post</code> to initialize a Direct Post publish request.</p>
+         <p>Use <code>/tiktok/upload-draft</code> to initialize the Upload API fallback flow.</p>
+         <p>Use <code>/tiktok/health</code> to verify deployment and active scopes.</p>`,
         { status: 200 }
       );
     } catch (err) {
-      return html(
-        `<h1>Worker exception</h1><p><code>${String(err?.message || err)}</code></p>`,
-        { status: 500 }
-      );
+      return html(`<h1>Worker exception</h1><p><code>${String(err?.message || err)}</code></p>`, {
+        status: 500,
+      });
     }
   },
 };

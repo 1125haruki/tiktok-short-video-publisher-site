@@ -13,6 +13,16 @@ TikTok OAuth v2 の最小 Worker です。
   - `code` と `state` を受ける
   - server-side で token 交換
   - 必要なら token を外部 sink に転送
+- `/tiktok/session`
+  - 現在の creator session を返す
+- `/tiktok/creator-info`
+  - `video.publish` がある時だけ creator posting settings を返す
+- `/tiktok/direct-post`
+  - `video.publish` がある時だけ Direct Post を初期化する
+- `/tiktok/upload-draft`
+  - Upload API fallback を初期化する
+- `/tiktok/status`
+  - publish status を返す
 
 ## 必須環境変数
 
@@ -38,7 +48,8 @@ TikTok OAuth v2 の最小 Worker です。
 
 ## 運用メモ
 
-- 最初は `TIKTOK_SCOPE=video.upload`
+- live の Upload API だけなら `TIKTOK_SCOPE=user.info.basic,video.upload`
+- Direct Post 審査を進める時は `TIKTOK_SCOPE=user.info.basic,video.upload,video.publish`
 - `TOKEN_SINK_URL` が未設定でも接続確認はできます
 - 本番では token の保存先を必ず決めてください
 - 現在の Worker URL は `https://tiktok-short-video-publisher-auth.chillsabo1125.workers.dev`

@@ -362,7 +362,7 @@
       <section class="hero">
         <article class="hero-copy">
           <div class="eyebrow">Public Product Website</div>
-          <h1>Prepare short-form uploads before they reach TikTok.</h1>
+          <h1>Prepare creator-ready TikTok posts before they go live.</h1>
           <p class="muted">
             Short Video Publisher is a web product for creators and small teams that manage original short-form
             videos, metadata, approval notes, and connected social delivery. This website is the public-facing
@@ -380,7 +380,7 @@
             </div>
             <div class="fact">
               <strong>2</strong>
-              <span>Connected publisher workspace for TikTok authorization and draft upload</span>
+              <span>Connected publisher workspace for TikTok authorization, creator review, and posting controls</span>
             </div>
             <div class="fact">
               <strong>3</strong>
@@ -393,13 +393,15 @@
           <div class="panel-block">
             <h3>Current TikTok Scope</h3>
             <p class="muted">
-              The first production scope uses TikTok Login Kit plus the Content Posting Upload API with
-              `video.upload`. The creator still reviews the final draft in TikTok before publishing.
+              The live scope currently uses TikTok Login Kit plus the Content Posting Upload API with `video.upload`.
+              The workspace also includes a Direct Post review layout that activates after `video.publish`
+              approval and creator consent.
             </p>
             <div class="pill-row">
               <span class="pill">Login Kit</span>
               <span class="pill">Content Posting API</span>
-              <span class="pill">Draft Upload Flow</span>
+              <span class="pill">Upload Fallback</span>
+              <span class="pill">Direct Post Review UI</span>
             </div>
           </div>
 
@@ -417,14 +419,14 @@
                 <div class="badge">2</div>
                 <div>
                   <strong>Product Tour</strong>
-                  <p class="muted">Open a guided walkthrough of the workspace, workflow, and TikTok draft experience.</p>
+                  <p class="muted">Open a guided walkthrough of the workspace, workflow, and TikTok posting experience.</p>
                 </div>
               </div>
               <div class="panel-item">
                 <div class="badge">3</div>
                 <div>
                   <strong>Publisher Workspace</strong>
-                  <p class="muted">Open the separate workspace page that starts TikTok authorization and draft creation.</p>
+                  <p class="muted">Open the separate workspace page that starts TikTok authorization, creator review, and posting setup.</p>
                 </div>
               </div>
             </div>
@@ -454,12 +456,12 @@
               <p>Creators connect authorized TikTok accounts from the dedicated publisher workspace using Login Kit.</p>
             </article>
             <article class="feature">
-              <h3>Draft Delivery</h3>
-              <p>The app initializes a Content Posting Upload API draft from a public MP4 URL.</p>
+              <h3>Creator Review Controls</h3>
+              <p>The workspace loads creator privacy, interaction, and duration settings before any TikTok delivery.</p>
             </article>
             <article class="feature">
-              <h3>Final Creator Review</h3>
-              <p>Short Video Publisher keeps the creator in control by handing final review back to TikTok.</p>
+              <h3>Delivery Modes</h3>
+              <p>The app can keep Upload API as a fallback while the Direct Post review build is prepared for approval.</p>
             </article>
           </div>
         </section>
@@ -485,8 +487,8 @@
             </article>
             <article class="ops-card">
               <strong>Stage 03</strong>
-              <h3>Send a draft upload</h3>
-              <p>The app creates a TikTok draft upload request and returns a publish ID for status inspection.</p>
+              <h3>Review posting settings</h3>
+              <p>The creator checks privacy, interaction toggles, duration limits, and consent before sending content to TikTok.</p>
             </article>
           </div>
         </section>
@@ -513,11 +515,11 @@
             </article>
             <article class="resource-card">
               <strong>Product Tour</strong>
-              <p>`tour.html` shows the website functions, workspace flow, and end-to-end TikTok draft journey with guided screens.</p>
+              <p>`tour.html` shows the website functions, workspace flow, and end-to-end TikTok posting journey with guided screens.</p>
             </article>
             <article class="resource-card">
               <strong>Publisher Workspace</strong>
-              <p>`workspace.html` is the dedicated app surface where TikTok authorization, session checks, and draft upload are performed.</p>
+              <p>`workspace.html` is the dedicated app surface where TikTok authorization, creator review, Direct Post controls, and Upload fallback are performed.</p>
             </article>
           </div>
         </section>
@@ -537,7 +539,7 @@
             </article>
             <article class="faq-card">
               <h3>Does the product publish directly to TikTok?</h3>
-              <p>The current production scope creates a draft upload. Final creator review happens inside TikTok before publishing.</p>
+              <p>The live scope still supports Upload API fallback. The workspace also includes a Direct Post review path that activates when `video.publish` is approved.</p>
             </article>
             <article class="faq-card">
               <h3>How can the workflow be understood end to end?</h3>

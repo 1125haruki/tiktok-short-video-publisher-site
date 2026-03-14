@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Short Video Publisher | Publisher Workspace</title>
+    <title>Short Video Publisher | Creator Workspace</title>
     <style>
       :root {
         --bg: #f4efe6;
@@ -31,7 +31,7 @@
         color: inherit;
       }
       .shell {
-        max-width: 1160px;
+        max-width: 1180px;
         margin: 0 auto;
         padding: 24px 18px 72px;
       }
@@ -81,7 +81,8 @@
       h3 {
         margin-bottom: 8px;
       }
-      p {
+      p,
+      li {
         line-height: 1.7;
       }
       .muted {
@@ -93,6 +94,10 @@
         border-radius: 18px;
         background: rgba(13, 124, 102, 0.08);
         color: var(--accent);
+      }
+      .callout.warn {
+        background: rgba(196, 126, 60, 0.12);
+        color: #7a4b16;
       }
       .steps {
         display: grid;
@@ -121,14 +126,24 @@
         margin-top: 18px;
       }
       button,
+      .button-link,
+      select,
+      input,
+      textarea {
+        font: inherit;
+      }
+      button,
       .button-link {
         appearance: none;
         border: none;
         border-radius: 999px;
         padding: 13px 18px;
-        font: inherit;
         cursor: pointer;
         text-decoration: none;
+      }
+      button:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
       }
       .button-primary {
         background: var(--accent);
@@ -144,7 +159,7 @@
       }
       .grid {
         display: grid;
-        grid-template-columns: 1.18fr 0.82fr;
+        grid-template-columns: 1.12fr 0.88fr;
         gap: 16px;
         margin-top: 18px;
       }
@@ -161,27 +176,27 @@
         margin-bottom: 8px;
       }
       input,
-      textarea {
+      textarea,
+      select {
         width: 100%;
         padding: 12px 14px;
         border: 1px solid var(--line);
         border-radius: 14px;
-        font: inherit;
         background: #fffdfa;
       }
       textarea {
-        min-height: 96px;
+        min-height: 88px;
         resize: vertical;
       }
       .meta {
         display: grid;
-        gap: 12px;
+        gap: 14px;
         margin-top: 14px;
       }
-      .meta-row {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
+      .two-col {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
       }
       .pill {
         display: inline-flex;
@@ -190,6 +205,16 @@
         background: rgba(13, 124, 102, 0.08);
         color: var(--accent);
         font-size: 13px;
+      }
+      .pill-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .field-hint {
+        margin-top: 6px;
+        font-size: 13px;
+        color: var(--muted);
       }
       .status-line {
         margin-top: 12px;
@@ -204,7 +229,8 @@
         color: var(--danger);
       }
       .checkline {
-        display: flex;
+        display: grid;
+        grid-template-columns: auto 1fr;
         gap: 10px;
         align-items: start;
         color: var(--muted);
@@ -213,11 +239,21 @@
         width: auto;
         margin-top: 4px;
       }
+      .toggle-grid {
+        display: grid;
+        gap: 10px;
+      }
+      .toggle-card {
+        padding: 14px;
+        border-radius: 18px;
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.76);
+      }
       .preview-panel {
         padding: 16px;
         border-radius: 18px;
         border: 1px solid var(--line);
-        background: rgba(255, 255, 255, 0.7);
+        background: rgba(255, 255, 255, 0.74);
         display: grid;
         gap: 12px;
       }
@@ -235,6 +271,25 @@
       .preview-row span {
         line-height: 1.6;
       }
+      .creator-head {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+      .creator-avatar {
+        width: 66px;
+        height: 66px;
+        border-radius: 999px;
+        border: 1px solid var(--line);
+        background: #efe9df;
+        object-fit: cover;
+      }
+      .inline-note {
+        padding: 12px 14px;
+        border-radius: 16px;
+        background: rgba(13, 124, 102, 0.06);
+        color: var(--muted);
+      }
       code,
       pre {
         font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
@@ -246,7 +301,7 @@
         background: #181818;
         color: #f7f7f7;
         overflow: auto;
-        min-height: 180px;
+        min-height: 220px;
       }
       video {
         width: 100%;
@@ -254,8 +309,13 @@
         border: 1px solid var(--line);
         background: #000;
       }
-      @media (max-width: 900px) {
-        .grid {
+      ul {
+        margin: 0;
+        padding-left: 20px;
+      }
+      @media (max-width: 960px) {
+        .grid,
+        .two-col {
           grid-template-columns: 1fr;
         }
       }
@@ -275,42 +335,42 @@
       </div>
 
       <section class="hero">
-        <div class="eyebrow">Publisher Workspace</div>
-        <h1>Prepare a draft delivery, then continue final review inside TikTok.</h1>
+        <div class="eyebrow">Creator Workspace</div>
+        <h1>Review creator settings, then send TikTok content from one workspace.</h1>
         <p class="muted">
-          This workspace is where creators connect TikTok, confirm the active account, prepare draft metadata, and
-          start a Content Posting draft upload from a public MP4 source.
+          This workspace handles TikTok Login Kit, creator session checks, creator posting settings, Direct Post
+          review controls, Upload API fallback, and publish status inspection from the same app surface.
         </p>
-        <div class="callout">
-          Current scope: Login Kit, session check, draft upload initialization, and publish status inspection.
-          Final editing and publish confirmation continue in the TikTok inbox flow.
+        <div class="callout" id="modeBanner">
+          Loading the current TikTok scope and workspace capability.
         </div>
         <div class="steps">
           <div class="step">
             <div class="badge">1</div>
             <div>
-              <strong>Connect the creator account</strong>
-              <p class="muted">Authorize TikTok and return to this workspace.</p>
+              <strong>Connect TikTok</strong>
+              <p class="muted">Authorize TikTok and return to the workspace with the latest approved scope.</p>
             </div>
           </div>
           <div class="step">
             <div class="badge">2</div>
             <div>
-              <strong>Prepare draft details</strong>
-              <p class="muted">Check creator identity, source video, title, and internal posting note.</p>
+              <strong>Load creator posting settings</strong>
+              <p class="muted">Query privacy options, interaction availability, and duration limits before posting.</p>
             </div>
           </div>
           <div class="step">
             <div class="badge">3</div>
             <div>
-              <strong>Create the draft request</strong>
-              <p class="muted">Initialize the TikTok draft upload and keep the publish ID for follow-up checks.</p>
+              <strong>Review consent and delivery mode</strong>
+              <p class="muted">Choose Direct Post when `video.publish` is approved, or keep Upload API as a fallback.</p>
             </div>
           </div>
         </div>
         <div class="actions">
           <a class="button-link button-primary" id="connectButton" href="#">Connect TikTok</a>
           <button class="button-secondary" id="refreshSessionButton" type="button">Refresh Creator Session</button>
+          <button class="button-secondary" id="loadCreatorInfoButton" type="button">Load Creator Posting Settings</button>
           <a class="button-link button-warm" href="./tour.html">View Product Tour</a>
         </div>
       </section>
@@ -318,43 +378,137 @@
       <section class="grid">
         <div class="stack">
           <article class="card">
-            <h2>Draft Setup</h2>
+            <h2>Post to TikTok</h2>
             <p class="muted">
-              Prepare the asset and draft note before sending the request to TikTok. These fields explain the
-              website function even when the final post editing continues inside TikTok.
+              This review form mirrors the TikTok posting controls required for Direct Post approval. Privacy must be
+              selected manually, interaction toggles start off, and creator consent is required before sending.
             </p>
             <div class="meta">
               <div>
                 <label for="videoUrl">Public MP4 URL</label>
                 <input id="videoUrl" type="url" />
+                <div class="field-hint">Use a public URL on a domain or URL prefix you control and can verify.</div>
               </div>
+
               <div>
-                <label for="draftTitle">Draft title</label>
-                <input id="draftTitle" type="text" placeholder="Example: Spring lookbook teaser" />
+                <label for="postTitle">TikTok title / caption</label>
+                <textarea
+                  id="postTitle"
+                  placeholder="Write the TikTok title that will be sent when Direct Post is enabled."
+                ></textarea>
               </div>
+
               <div>
-                <label for="draftNote">Internal caption / posting note</label>
-                <textarea id="draftNote" placeholder="Example: Final hashtags and text are confirmed in the TikTok inbox review step."></textarea>
+                <label for="internalNote">Internal review note</label>
+                <textarea
+                  id="internalNote"
+                  placeholder="Optional internal note for the team. This field is not sent to TikTok."
+                ></textarea>
               </div>
+
+              <div class="two-col">
+                <div>
+                  <label for="detectedDuration">Detected video duration (seconds)</label>
+                  <input id="detectedDuration" type="text" readonly />
+                </div>
+                <div>
+                  <label for="manualDuration">Manual duration override (seconds)</label>
+                  <input id="manualDuration" type="number" min="1" step="1" placeholder="Use only if auto detection fails." />
+                </div>
+              </div>
+
+              <div>
+                <label for="privacyLevel">TikTok privacy</label>
+                <select id="privacyLevel">
+                  <option value="">Load creator settings first</option>
+                </select>
+                <div class="field-hint" id="privacyHint">
+                  Privacy options come from `creator_info/query` and intentionally start with no default selection.
+                </div>
+              </div>
+
+              <div class="toggle-grid">
+                <div class="toggle-card">
+                  <label class="checkline">
+                    <input id="allowComment" type="checkbox" />
+                    <span>Allow comments</span>
+                  </label>
+                </div>
+                <div class="toggle-card">
+                  <label class="checkline">
+                    <input id="allowDuet" type="checkbox" />
+                    <span>Allow duets</span>
+                  </label>
+                </div>
+                <div class="toggle-card">
+                  <label class="checkline">
+                    <input id="allowStitch" type="checkbox" />
+                    <span>Allow stitches</span>
+                  </label>
+                </div>
+                <div class="toggle-card">
+                  <label class="checkline">
+                    <input id="isAigc" type="checkbox" />
+                    <span>This video contains AI-generated content</span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="toggle-grid">
+                <div class="toggle-card">
+                  <label class="checkline">
+                    <input id="brandOrganicToggle" type="checkbox" />
+                    <span>This post promotes the creator's own brand, product, or service</span>
+                  </label>
+                </div>
+                <div class="toggle-card">
+                  <label class="checkline">
+                    <input id="brandContentToggle" type="checkbox" />
+                    <span>This post includes a paid partnership or branded content disclosure</span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="inline-note">
+                Direct Post review should keep creator choices explicit. Comments, duets, and stitches stay off until
+                the creator enables them here.
+              </div>
+
               <label class="checkline">
                 <input id="consentCheckbox" type="checkbox" />
-                <span>I confirm this creator owns or is authorized to publish this video and will complete the final review inside TikTok.</span>
+                <span
+                  >I confirm this creator is authorized to publish this video, I reviewed the TikTok posting settings,
+                  and I accept the
+                  <a href="https://developers.tiktok.com/doc/content-sharing-guidelines/" target="_blank" rel="noreferrer"
+                    >Content Sharing Guidelines</a
+                  >
+                  plus the
+                  <a href="https://www.tiktok.com/legal/page/global/music-usage-confirmation/en" target="_blank" rel="noreferrer"
+                    >Music Usage Confirmation</a
+                  >.</span
+                >
               </label>
+
               <div class="actions">
-                <button class="button-primary" id="uploadDraftButton" type="button">Create Upload Draft</button>
+                <button class="button-primary" id="directPostButton" type="button">Direct Post to TikTok</button>
+                <button class="button-secondary" id="uploadDraftButton" type="button">Create Upload Draft Fallback</button>
                 <button class="button-secondary" id="checkStatusButton" type="button">Check Publish Status</button>
               </div>
+
               <div>
                 <label for="publishId">Publish ID</label>
-                <input id="publishId" type="text" placeholder="Filled after upload draft creation" />
+                <input id="publishId" type="text" placeholder="Filled after Direct Post or Upload fallback creation" />
               </div>
             </div>
-            <div class="status-line" id="statusLine">Ready. Connect TikTok or refresh the current creator session.</div>
+            <div class="status-line" id="statusLine">Ready. Connect TikTok, then load creator posting settings.</div>
           </article>
 
           <article class="card">
             <h2>Live JSON Response</h2>
-            <p class="muted">Worker responses are shown below for transparency during account connection and status checks.</p>
+            <p class="muted">
+              Worker responses stay visible for transparency during account connection, creator info review, posting,
+              and status checks.
+            </p>
             <pre id="jsonOutput">{
   "ready": true
 }</pre>
@@ -365,45 +519,77 @@
           <article class="card">
             <h2>Connected Creator</h2>
             <div class="preview-panel">
-              <div class="preview-row">
-                <strong>Creator</strong>
-                <span id="creatorName">No creator connected yet</span>
+              <div class="creator-head">
+                <img class="creator-avatar" id="creatorAvatar" alt="Creator avatar" />
+                <div>
+                  <strong id="creatorName">No creator connected yet</strong>
+                  <div class="muted" id="creatorHandle">Connect TikTok to inspect the current creator.</div>
+                </div>
               </div>
               <div class="preview-row">
-                <strong>Current Scope</strong>
+                <strong>Connected scope</strong>
                 <span id="creatorScope">user.info.basic, video.upload</span>
               </div>
               <div class="preview-row">
-                <strong>Next Step After Draft</strong>
-                <span>TikTok notifies the creator to continue editing and final review in the inbox flow.</span>
+                <strong>Worker scope</strong>
+                <span id="workerScope">Loading...</span>
+              </div>
+              <div class="preview-row">
+                <strong>Creator privacy options</strong>
+                <span id="creatorPrivacy">Load creator settings to see privacy options.</span>
+              </div>
+              <div class="preview-row">
+                <strong>Creator interaction availability</strong>
+                <span id="creatorInteractions">Comments, duets, and stitches will be checked after `creator_info/query`.</span>
+              </div>
+              <div class="preview-row">
+                <strong>Max TikTok video duration</strong>
+                <span id="creatorDurationLimit">Load creator settings to compare the source video length.</span>
               </div>
             </div>
           </article>
 
           <article class="card">
-            <h2>Draft Preview</h2>
+            <h2>Post Preview</h2>
             <div class="preview-panel">
               <div class="preview-row">
                 <strong>Prepared title</strong>
-                <span id="previewTitle">Spring lookbook teaser</span>
+                <span id="previewTitle">AI cat daily story | episode 1</span>
               </div>
               <div class="preview-row">
-                <strong>Prepared note</strong>
-                <span id="previewNote">Final hashtags and text are confirmed in the TikTok inbox review step.</span>
+                <strong>Internal note</strong>
+                <span id="previewNote">Direct Post review mode is prepared while Upload API remains available.</span>
+              </div>
+              <div class="preview-row">
+                <strong>Selected privacy</strong>
+                <span id="previewPrivacy">No privacy selected yet.</span>
               </div>
               <div class="preview-row">
                 <strong>Source video</strong>
-                <span id="previewVideo">Public MP4 sample is loaded by default.</span>
+                <span id="previewVideo">A sample MP4 is loaded by default.</span>
               </div>
+            </div>
+            <div style="margin-top: 14px">
+              <video id="assetPreview" controls preload="metadata" crossorigin="anonymous"></video>
             </div>
           </article>
 
           <article class="card">
-            <h2>Workflow Tour Video</h2>
-            <p class="muted">The product tour video shows the website, workspace, and draft flow end to end.</p>
-            <video controls preload="metadata">
-              <source src="./assets/short-video-publisher-product-tour.mp4" type="video/mp4" />
-            </video>
+            <h2>Workspace Capability</h2>
+            <div class="preview-panel">
+              <div class="preview-row">
+                <strong>Direct Post review state</strong>
+                <span id="directPostState">Waiting for worker scope and creator session.</span>
+              </div>
+              <div class="preview-row">
+                <strong>Upload fallback</strong>
+                <span id="uploadFallbackState">Upload API stays available while `video.publish` approval is in progress.</span>
+              </div>
+              <div class="preview-row">
+                <strong>Duration check</strong>
+                <span id="durationState">The workspace compares the source video duration with TikTok creator limits.</span>
+              </div>
+            </div>
           </article>
         </div>
       </section>
@@ -412,30 +598,86 @@
     <script>
       const workerBase = "https://tiktok-short-video-publisher-auth.chillsabo1125.workers.dev";
       const sampleVideoUrl =
-        "https://1125haruki.github.io/tiktok-short-video-publisher-site/assets/short-video-publisher-product-tour.mp4";
+        "https://1125haruki.github.io/tiktok-short-video-publisher-site/assets/16877_1920x1080.mp4";
+
+      const state = {
+        workerScope: "",
+        workerCapabilities: null,
+        sessionScope: "",
+        creatorInfo: null,
+        detectedDurationSec: null,
+      };
 
       const connectButton = document.getElementById("connectButton");
       const refreshSessionButton = document.getElementById("refreshSessionButton");
+      const loadCreatorInfoButton = document.getElementById("loadCreatorInfoButton");
+      const directPostButton = document.getElementById("directPostButton");
       const uploadDraftButton = document.getElementById("uploadDraftButton");
       const checkStatusButton = document.getElementById("checkStatusButton");
+
       const videoUrlInput = document.getElementById("videoUrl");
-      const draftTitleInput = document.getElementById("draftTitle");
-      const draftNoteInput = document.getElementById("draftNote");
+      const postTitleInput = document.getElementById("postTitle");
+      const internalNoteInput = document.getElementById("internalNote");
+      const detectedDurationInput = document.getElementById("detectedDuration");
+      const manualDurationInput = document.getElementById("manualDuration");
+      const privacyLevelSelect = document.getElementById("privacyLevel");
+      const allowCommentInput = document.getElementById("allowComment");
+      const allowDuetInput = document.getElementById("allowDuet");
+      const allowStitchInput = document.getElementById("allowStitch");
+      const isAigcInput = document.getElementById("isAigc");
+      const brandOrganicToggleInput = document.getElementById("brandOrganicToggle");
+      const brandContentToggleInput = document.getElementById("brandContentToggle");
       const consentCheckbox = document.getElementById("consentCheckbox");
       const publishIdInput = document.getElementById("publishId");
+
       const statusLine = document.getElementById("statusLine");
       const jsonOutput = document.getElementById("jsonOutput");
+      const modeBanner = document.getElementById("modeBanner");
+      const workerScopeEl = document.getElementById("workerScope");
+      const directPostStateEl = document.getElementById("directPostState");
+      const uploadFallbackStateEl = document.getElementById("uploadFallbackState");
+      const durationStateEl = document.getElementById("durationState");
+      const privacyHintEl = document.getElementById("privacyHint");
+
+      const creatorAvatar = document.getElementById("creatorAvatar");
       const creatorName = document.getElementById("creatorName");
+      const creatorHandle = document.getElementById("creatorHandle");
       const creatorScope = document.getElementById("creatorScope");
+      const creatorPrivacy = document.getElementById("creatorPrivacy");
+      const creatorInteractions = document.getElementById("creatorInteractions");
+      const creatorDurationLimit = document.getElementById("creatorDurationLimit");
+
       const previewTitle = document.getElementById("previewTitle");
       const previewNote = document.getElementById("previewNote");
+      const previewPrivacy = document.getElementById("previewPrivacy");
       const previewVideo = document.getElementById("previewVideo");
+      const assetPreview = document.getElementById("assetPreview");
 
       videoUrlInput.value = sampleVideoUrl;
-      draftTitleInput.value = "Spring lookbook teaser";
-      draftNoteInput.value =
-        "Final hashtags and text are confirmed in the TikTok inbox review step.";
+      postTitleInput.value = "AI cat daily story | episode 1";
+      internalNoteInput.value = "Direct Post review mode is prepared while Upload API remains available.";
       connectButton.href = `${workerBase}/tiktok/connect`;
+
+      function parseScopes(scopeText) {
+        return (scopeText || "")
+          .split(",")
+          .map((value) => value.trim())
+          .filter(Boolean);
+      }
+
+      function hasScope(scopeText, scopeName) {
+        return parseScopes(scopeText).includes(scopeName);
+      }
+
+      function formatPrivacyOption(option) {
+        const labels = {
+          PUBLIC_TO_EVERYONE: "Public to everyone",
+          MUTUAL_FOLLOW_FRIENDS: "Friends who follow each other",
+          FOLLOWER_OF_CREATOR: "Followers of creator",
+          SELF_ONLY: "Only me",
+        };
+        return labels[option] || option;
+      }
 
       function setStatus(message, isError = false) {
         statusLine.textContent = message;
@@ -447,9 +689,150 @@
       }
 
       function syncPreview() {
-        previewTitle.textContent = draftTitleInput.value.trim() || "No title prepared yet.";
-        previewNote.textContent = draftNoteInput.value.trim() || "No note prepared yet.";
+        previewTitle.textContent = postTitleInput.value.trim() || "No title prepared yet.";
+        previewNote.textContent = internalNoteInput.value.trim() || "No internal note prepared yet.";
         previewVideo.textContent = videoUrlInput.value.trim() || "No public MP4 URL set.";
+        previewPrivacy.textContent = privacyLevelSelect.value
+          ? formatPrivacyOption(privacyLevelSelect.value)
+          : "No privacy selected yet.";
+
+        const nextUrl = videoUrlInput.value.trim();
+        if (!nextUrl) {
+          assetPreview.removeAttribute("src");
+          assetPreview.load();
+          state.detectedDurationSec = null;
+          detectedDurationInput.value = "";
+          updateModeUI();
+          return;
+        }
+        if (assetPreview.src !== nextUrl) {
+          assetPreview.src = nextUrl;
+          assetPreview.load();
+        }
+      }
+
+      function getEffectiveDurationSec() {
+        const manualValue = Number(manualDurationInput.value);
+        if (Number.isFinite(manualValue) && manualValue > 0) {
+          return manualValue;
+        }
+        return state.detectedDurationSec;
+      }
+
+      function clearCreatorSettings() {
+        state.creatorInfo = null;
+        privacyLevelSelect.innerHTML = '<option value="">Load creator settings first</option>';
+        allowCommentInput.checked = false;
+        allowDuetInput.checked = false;
+        allowStitchInput.checked = false;
+        allowCommentInput.disabled = true;
+        allowDuetInput.disabled = true;
+        allowStitchInput.disabled = true;
+        creatorAvatar.src = "./assets/tiktok-app-icon.png";
+        creatorPrivacy.textContent = "Load creator settings to see privacy options.";
+        creatorInteractions.textContent =
+          "Comments, duets, and stitches will be checked after `creator_info/query`.";
+        creatorDurationLimit.textContent = "Load creator settings to compare the source video length.";
+        privacyHintEl.textContent =
+          "Privacy options come from `creator_info/query` and intentionally start with no default selection.";
+      }
+
+      function applyCreatorSettings(data) {
+        state.creatorInfo = data || null;
+        const avatarUrl = data?.creator_avatar_url || "";
+        const nickname = data?.creator_nickname || "Connected creator";
+        const username = data?.creator_username || data?.creator_open_id || "TikTok creator";
+        const privacyOptions = Array.isArray(data?.privacy_level_options) ? data.privacy_level_options : [];
+        const maxDuration = data?.max_video_post_duration_sec;
+
+        creatorAvatar.src = avatarUrl || "./assets/tiktok-app-icon.png";
+        creatorName.textContent = nickname;
+        creatorHandle.textContent = username;
+        creatorPrivacy.textContent = privacyOptions.length
+          ? privacyOptions.map(formatPrivacyOption).join(", ")
+          : "TikTok did not return privacy options.";
+        creatorInteractions.textContent = [
+          data?.comment_disabled ? "Comments unavailable" : "Comments available",
+          data?.duet_disabled ? "Duets unavailable" : "Duets available",
+          data?.stitch_disabled ? "Stitches unavailable" : "Stitches available",
+        ].join(" / ");
+        creatorDurationLimit.textContent = Number.isFinite(maxDuration)
+          ? `${maxDuration} seconds`
+          : "TikTok did not return a duration limit.";
+
+        privacyLevelSelect.innerHTML =
+          '<option value="">Select privacy manually</option>' +
+          privacyOptions
+            .map(
+              (option) =>
+                `<option value="${option}">${formatPrivacyOption(option)}</option>`
+            )
+            .join("");
+
+        allowCommentInput.checked = false;
+        allowDuetInput.checked = false;
+        allowStitchInput.checked = false;
+        allowCommentInput.disabled = Boolean(data?.comment_disabled);
+        allowDuetInput.disabled = Boolean(data?.duet_disabled);
+        allowStitchInput.disabled = Boolean(data?.stitch_disabled);
+
+        privacyHintEl.textContent =
+          "Privacy options are loaded from TikTok and remain unselected until the creator chooses one.";
+        updateModeUI();
+        syncPreview();
+      }
+
+      function updateModeUI() {
+        workerScopeEl.textContent = state.workerScope || "Loading...";
+        creatorScope.textContent = state.sessionScope || "Not connected";
+
+        const workerHasDirectPost = hasScope(state.workerScope, "video.publish");
+        const sessionHasDirectPost = hasScope(state.sessionScope, "video.publish");
+        const sessionHasUpload = hasScope(state.sessionScope, "video.upload");
+        const effectiveDuration = getEffectiveDurationSec();
+        const maxDuration = state.creatorInfo?.max_video_post_duration_sec;
+
+        if (workerHasDirectPost) {
+          modeBanner.textContent =
+            "Direct Post review mode is configured on the worker. Reconnect TikTok if the creator session still lacks `video.publish`.";
+          modeBanner.classList.remove("warn");
+        } else {
+          modeBanner.textContent =
+            "Live scope currently uses Upload API only. This workspace already includes the Direct Post review layout so it can activate after `video.publish` approval.";
+          modeBanner.classList.add("warn");
+        }
+
+        if (!sessionHasDirectPost) {
+          directPostStateEl.textContent =
+            "Direct Post is waiting for a creator session that includes `video.publish`.";
+        } else if (!state.creatorInfo) {
+          directPostStateEl.textContent =
+            "Direct Post scope is present. Load creator posting settings before sending.";
+        } else {
+          directPostStateEl.textContent =
+            "Direct Post controls are ready. Privacy is manual and interaction toggles stay off until the creator enables them.";
+        }
+
+        uploadFallbackStateEl.textContent = sessionHasUpload
+          ? "Upload API fallback is available with the connected creator session."
+          : "Reconnect TikTok with `video.upload` if you still want the Upload API fallback.";
+
+        if (Number.isFinite(maxDuration) && Number.isFinite(effectiveDuration)) {
+          durationStateEl.textContent =
+            effectiveDuration <= maxDuration
+              ? `Source video is within the current TikTok limit (${effectiveDuration}s / ${maxDuration}s).`
+              : `Source video exceeds the current TikTok limit (${effectiveDuration}s / ${maxDuration}s).`;
+        } else if (Number.isFinite(maxDuration)) {
+          durationStateEl.textContent =
+            "Load a public video URL with readable metadata or enter the duration manually before Direct Post.";
+        } else {
+          durationStateEl.textContent =
+            "The workspace compares the source video duration with TikTok creator limits after creator settings load.";
+        }
+
+        loadCreatorInfoButton.disabled = !sessionHasDirectPost;
+        directPostButton.disabled = !sessionHasDirectPost;
+        uploadDraftButton.disabled = !sessionHasUpload;
       }
 
       async function callJson(path, options = {}) {
@@ -463,8 +846,18 @@
         });
         const data = await response.json().catch(() => ({}));
         if (!response.ok) {
-          throw new Error(data.message || data.error || `HTTP ${response.status}`);
+          const error = new Error(data.message || data.error || `HTTP ${response.status}`);
+          error.payload = data;
+          throw error;
         }
+        return data;
+      }
+
+      async function loadHealth() {
+        const data = await callJson("/tiktok/health");
+        state.workerScope = data.scope || "";
+        state.workerCapabilities = data.capabilities || null;
+        updateModeUI();
         return data;
       }
 
@@ -473,20 +866,128 @@
         try {
           const data = await callJson("/tiktok/session");
           showJson(data);
+          state.sessionScope = data.scope || "";
           if (data.connected) {
             const name = data.user?.display_name || data.user?.open_id || "connected";
             creatorName.textContent = name;
-            creatorScope.textContent = data.scope || "user.info.basic, video.upload";
+            creatorHandle.textContent = data.user?.open_id || "Connected creator";
+            creatorAvatar.src = data.user?.avatar_url || "./assets/tiktok-app-icon.png";
             setStatus(`TikTok creator connected: ${name}`);
           } else {
+            state.sessionScope = "";
             creatorName.textContent = "No creator connected yet";
-            creatorScope.textContent = "user.info.basic, video.upload";
+            creatorHandle.textContent = "Connect TikTok to inspect the current creator.";
+            creatorAvatar.src = "./assets/tiktok-app-icon.png";
+            clearCreatorSettings();
             setStatus("No TikTok account is connected yet. Start login from this workspace.", true);
           }
+          updateModeUI();
+          return data;
         } catch (error) {
+          state.sessionScope = "";
           creatorName.textContent = "Connection unavailable";
-          showJson({ error: String(error.message || error) });
+          creatorHandle.textContent = "The current session could not be loaded.";
+          creatorAvatar.src = "./assets/tiktok-app-icon.png";
+          clearCreatorSettings();
+          showJson({ error: String(error.message || error), details: error.payload || null });
           setStatus(`Failed to load session: ${error.message || error}`, true);
+          updateModeUI();
+          throw error;
+        }
+      }
+
+      async function loadCreatorInfo() {
+        if (!hasScope(state.sessionScope, "video.publish")) {
+          setStatus("Reconnect TikTok with `video.publish` before loading creator posting settings.", true);
+          return;
+        }
+        setStatus("Loading creator posting settings from TikTok.");
+        try {
+          const data = await callJson("/tiktok/creator-info", { method: "POST" });
+          applyCreatorSettings(data.data);
+          showJson(data);
+          setStatus("Creator posting settings loaded.");
+        } catch (error) {
+          clearCreatorSettings();
+          showJson({ error: String(error.message || error), details: error.payload || null });
+          setStatus(`Failed to load creator settings: ${error.message || error}`, true);
+        }
+      }
+
+      function validateDirectPost() {
+        const videoUrl = videoUrlInput.value.trim();
+        const title = postTitleInput.value.trim();
+        const privacyLevel = privacyLevelSelect.value;
+        const effectiveDuration = getEffectiveDurationSec();
+        const maxDuration = state.creatorInfo?.max_video_post_duration_sec;
+
+        if (!hasScope(state.sessionScope, "video.publish")) {
+          return "Reconnect TikTok with `video.publish` before using Direct Post.";
+        }
+        if (!state.creatorInfo) {
+          return "Load creator posting settings before using Direct Post.";
+        }
+        if (!videoUrl) {
+          return "A public MP4 URL is required.";
+        }
+        if (!title) {
+          return "A TikTok title / caption is required for Direct Post review.";
+        }
+        if (!privacyLevel) {
+          return "Choose a TikTok privacy option manually.";
+        }
+        if (!consentCheckbox.checked) {
+          return "Creator consent is required before sending Direct Post.";
+        }
+        if (brandContentToggleInput.checked && privacyLevel === "SELF_ONLY") {
+          return "Branded content cannot be sent with a private `SELF_ONLY` privacy setting.";
+        }
+        if (Number.isFinite(maxDuration) && !Number.isFinite(effectiveDuration)) {
+          return "Detect the video duration automatically or enter it manually before Direct Post.";
+        }
+        if (Number.isFinite(maxDuration) && Number.isFinite(effectiveDuration) && effectiveDuration > maxDuration) {
+          return `The source video is longer than the current TikTok limit of ${maxDuration} seconds.`;
+        }
+        return null;
+      }
+
+      async function directPost() {
+        const validationError = validateDirectPost();
+        if (validationError) {
+          setStatus(validationError, true);
+          return;
+        }
+
+        setStatus("Initializing Direct Post on TikTok.");
+        try {
+          const data = await callJson("/tiktok/direct-post", {
+            method: "POST",
+            body: JSON.stringify({
+              videoUrl: videoUrlInput.value.trim(),
+              title: postTitleInput.value.trim(),
+              privacyLevel: privacyLevelSelect.value,
+              allowComment: allowCommentInput.checked,
+              allowDuet: allowDuetInput.checked,
+              allowStitch: allowStitchInput.checked,
+              brandOrganicToggle: brandOrganicToggleInput.checked,
+              brandContentToggle: brandContentToggleInput.checked,
+              isAigc: isAigcInput.checked,
+            }),
+          });
+          if (data.publishId) {
+            publishIdInput.value = data.publishId;
+          }
+          showJson({
+            ...data,
+            preparedMetadata: {
+              internalNote: internalNoteInput.value.trim(),
+              effectiveDurationSec: getEffectiveDurationSec(),
+            },
+          });
+          setStatus("Direct Post request created. Use publish status to track progress.");
+        } catch (error) {
+          showJson({ error: String(error.message || error), details: error.payload || null });
+          setStatus(`Direct Post failed: ${error.message || error}`, true);
         }
       }
 
@@ -497,11 +998,11 @@
           return;
         }
         if (!consentCheckbox.checked) {
-          setStatus("Confirm creator authorization and final TikTok review before creating the draft.", true);
+          setStatus("Creator consent is required before creating the Upload API fallback request.", true);
           return;
         }
 
-        setStatus("Creating TikTok upload draft.");
+        setStatus("Creating the Upload API fallback request.");
         try {
           const data = await callJson("/tiktok/upload-draft", {
             method: "POST",
@@ -513,14 +1014,14 @@
           showJson({
             ...data,
             preparedMetadata: {
-              draftTitle: draftTitleInput.value.trim(),
-              draftNote: draftNoteInput.value.trim(),
+              title: postTitleInput.value.trim(),
+              internalNote: internalNoteInput.value.trim(),
             },
           });
-          setStatus("Upload draft request created. Use publish status to inspect progress.");
+          setStatus("Upload fallback request created. Final review continues inside TikTok.");
         } catch (error) {
-          showJson({ error: String(error.message || error) });
-          setStatus(`Failed to create upload draft: ${error.message || error}`, true);
+          showJson({ error: String(error.message || error), details: error.payload || null });
+          setStatus(`Upload fallback failed: ${error.message || error}`, true);
         }
       }
 
@@ -537,24 +1038,54 @@
           showJson(data);
           setStatus("Publish status loaded.");
         } catch (error) {
-          showJson({ error: String(error.message || error) });
+          showJson({ error: String(error.message || error), details: error.payload || null });
           setStatus(`Failed to fetch publish status: ${error.message || error}`, true);
         }
       }
 
+      assetPreview.addEventListener("loadedmetadata", () => {
+        const duration = Number(assetPreview.duration);
+        state.detectedDurationSec = Number.isFinite(duration) ? Math.round(duration * 10) / 10 : null;
+        detectedDurationInput.value = state.detectedDurationSec ? String(state.detectedDurationSec) : "";
+        updateModeUI();
+      });
+
+      assetPreview.addEventListener("error", () => {
+        state.detectedDurationSec = null;
+        detectedDurationInput.value = "";
+        updateModeUI();
+      });
+
       refreshSessionButton.addEventListener("click", refreshSession);
+      loadCreatorInfoButton.addEventListener("click", loadCreatorInfo);
+      directPostButton.addEventListener("click", directPost);
       uploadDraftButton.addEventListener("click", uploadDraft);
       checkStatusButton.addEventListener("click", checkStatus);
+
       videoUrlInput.addEventListener("input", syncPreview);
-      draftTitleInput.addEventListener("input", syncPreview);
-      draftNoteInput.addEventListener("input", syncPreview);
+      postTitleInput.addEventListener("input", syncPreview);
+      internalNoteInput.addEventListener("input", syncPreview);
+      privacyLevelSelect.addEventListener("change", syncPreview);
+      manualDurationInput.addEventListener("input", updateModeUI);
+      brandContentToggleInput.addEventListener("change", updateModeUI);
 
+      clearCreatorSettings();
       syncPreview();
-      refreshSession().catch(() => {});
 
-      if (new URLSearchParams(window.location.search).get("connected")) {
-        refreshSession();
-      }
+      Promise.allSettled([loadHealth(), refreshSession()]).then(() => {
+        updateModeUI();
+        if (new URLSearchParams(window.location.search).get("connected")) {
+          refreshSession()
+            .then(() => {
+              if (hasScope(state.sessionScope, "video.publish")) {
+                loadCreatorInfo();
+              }
+            })
+            .catch(() => {});
+        } else if (hasScope(state.sessionScope, "video.publish")) {
+          loadCreatorInfo();
+        }
+      });
     </script>
   </body>
 </html>

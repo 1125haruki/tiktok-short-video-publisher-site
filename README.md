@@ -23,7 +23,7 @@ TikTok Developers 申請用の最小公開セットです。
 
 `index.html` は外向けの完成した product website として使います。
 `tour.html` は product walkthrough と workflow video の案内ページです。
-`workspace.html` は TikTok Login Kit と upload draft を実行する publisher workspace です。
+`workspace.html` は TikTok Login Kit、creator info review、Direct Post 審査向け posting controls、Upload fallback をまとめた publisher workspace です。
 `help.html` は workflow と support の公開ヘルプページです。
 `review.html` と `demo.html` は古い URL からの redirect 用に残しています。
 
@@ -63,3 +63,6 @@ TikTok Developers 申請用の最小公開セットです。
 - `Website URL` は login page ではなく public website にする
 - live な TikTok 認可導線は `workspace.html` のような separate app page に分ける
 - workflow 動画と product walkthrough は `tour.html` にまとめる
+- Direct Post 審査では `creator_info/query` を使って privacy / interaction / duration を creator に見せる
+- Direct Post を有効化する時は Worker の scope を `user.info.basic,video.upload,video.publish` に広げる
+- `PULL_FROM_URL` で使う動画URLは、自分が所有・検証できる domain か URL prefix に寄せる

@@ -157,7 +157,8 @@
         <h1>Setup, workflow, and support for Short Video Publisher.</h1>
         <p class="muted">
           This help center explains how creators move from the public website into the publisher workspace, connect
-          TikTok, prepare a draft upload, and complete the final publish review on TikTok.
+          TikTok, review posting settings, send either Direct Post or Upload fallback, and complete any remaining
+          TikTok steps.
         </p>
         <div class="link-list">
           <a href="./workspace.html">Open Publisher Workspace</a>
@@ -187,8 +188,8 @@
             <div class="step">
               <div class="badge">3</div>
               <div>
-                <h3>Create a draft upload</h3>
-                <p class="muted">Prepare the public MP4 source and initialize the TikTok draft request.</p>
+                <h3>Load creator settings and send</h3>
+                <p class="muted">Review privacy, interaction toggles, and duration limits before Direct Post or Upload fallback.</p>
               </div>
             </div>
           </div>
@@ -199,19 +200,20 @@
           <ul>
             <li>Login Kit for creator account connection</li>
             <li>`user.info.basic` for the connected account display</li>
-            <li>`video.upload` for TikTok draft upload initialization</li>
+            <li>`video.upload` for the live Upload API fallback</li>
+            <li>Review-ready Direct Post controls that activate after `video.publish` approval</li>
             <li>Publish status inspection from the returned publish ID</li>
-            <li>Final editing and publish confirmation on TikTok</li>
+            <li>Creator-controlled privacy, interaction, and consent review inside the workspace</li>
           </ul>
         </article>
 
         <article class="card">
-          <h2>Draft Workflow</h2>
+          <h2>Posting Workflow</h2>
           <ul>
-            <li>Prepare the public MP4 URL and internal posting note inside the workspace</li>
-            <li>Confirm creator authorization before creating the draft upload request</li>
+            <li>Prepare the public MP4 URL, TikTok title, and internal approval note inside the workspace</li>
+            <li>Load creator settings so privacy options and interaction limits come from TikTok, not from defaults</li>
+            <li>Collect creator consent before sending Direct Post or Upload fallback</li>
             <li>Keep the publish ID to inspect status later from the same workspace</li>
-            <li>Finish final review in TikTok after the draft is created</li>
           </ul>
         </article>
 
