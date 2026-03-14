@@ -596,7 +596,21 @@
     </div>
 
     <script>
-      const workerBase = "https://tiktok-short-video-publisher-auth.chillsabo1125.workers.dev";
+      const urlParams = new URLSearchParams(window.location.search);
+      const workspaceMode = urlParams.get("mode") === "sandbox" ? "sandbox" : "production";
+      const workerConfig =
+        workspaceMode === "sandbox"
+          ? {
+              workerBase: "https://tiktok-short-video-publisher-auth-sandbox.chillsabo1125.workers.dev",
+              connectLabel: "Sandbox Direct Post review mode",
+              uploadLabel: "Sandbox scope requests `video.publish` for Direct Post testing.",
+            }
+          : {
+              workerBase: "https://tiktok-short-video-publisher-auth.chillsabo1125.workers.dev",
+              connectLabel: "Production Upload mode",
+              uploadLabel: "Live scope currently uses Upload API only.",
+            };
+      const workerBase = workerConfig.workerBase;
       const sampleVideoUrl =
         "https://1125haruki.github.io/tiktok-short-video-publisher-site/assets/16877_1920x1080.mp4";
 
@@ -798,7 +812,7 @@
           modeBanner.classList.remove("warn");
         } else {
           modeBanner.textContent =
-            "Live scope currently uses Upload API only. This workspace already includes the Direct Post review layout so it can activate after `video.publish` approval.";
+            `${workerConfig.uploadLabel} This workspace already includes the Direct Post review layout so it can activate after \`video.publish\` approval.`;
           modeBanner.classList.add("warn");
         }
 
@@ -1074,7 +1088,12 @@
 
       Promise.allSettled([loadHealth(), refreshSession()]).then(() => {
         updateModeUI();
-        if (new URLSearchParams(window.location.search).get("connected")) {
+        if (workspaceMode === "sandbox") {
+          modeBanner.textContent =
+            "Sandbox workspace is selected. Use this mode after creating a TikTok Developers sandbox and configuring the sandbox worker credentials.";
+          modeBanner.classList.remove("warn");
+        }
+        if (urlParams.get("connected")) {
           refreshSession()
             .then(() => {
               if (hasScope(state.sessionScope, "video.publish")) {

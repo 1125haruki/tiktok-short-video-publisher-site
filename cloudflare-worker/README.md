@@ -53,3 +53,5 @@ TikTok OAuth v2 の最小 Worker です。
 - `TOKEN_SINK_URL` が未設定でも接続確認はできます
 - 本番では token の保存先を必ず決めてください
 - 現在の Worker URL は `https://tiktok-short-video-publisher-auth.chillsabo1125.workers.dev`
+- sandbox 用の Worker URL は `https://tiktok-short-video-publisher-auth-sandbox.chillsabo1125.workers.dev`
+- sandbox 環境の deploy は `npm run deploy:sandbox`

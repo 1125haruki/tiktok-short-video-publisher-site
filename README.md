@@ -35,6 +35,8 @@ TikTok Developers 申請用の最小公開セットです。
   - `https://1125haruki.github.io/tiktok-short-video-publisher-site/tour.html`
 - `Publisher Workspace`
   - `https://1125haruki.github.io/tiktok-short-video-publisher-site/workspace.html`
+- `Sandbox Workspace`
+  - `https://1125haruki.github.io/tiktok-short-video-publisher-site/workspace.html?mode=sandbox`
 - `Help Center`
   - `https://1125haruki.github.io/tiktok-short-video-publisher-site/help.html`
 - `Privacy Policy URL`
@@ -43,8 +45,12 @@ TikTok Developers 申請用の最小公開セットです。
   - `https://1125haruki.github.io/tiktok-short-video-publisher-site/terms-of-service.html`
 - `Redirect URI`
   - `https://tiktok-short-video-publisher-auth.chillsabo1125.workers.dev/tiktok/callback`
+- `Sandbox Redirect URI`
+  - `https://tiktok-short-video-publisher-auth-sandbox.chillsabo1125.workers.dev/tiktok/callback`
 - `Health Check`
   - `https://tiktok-short-video-publisher-auth.chillsabo1125.workers.dev/tiktok/health`
+- `Sandbox Health Check`
+  - `https://tiktok-short-video-publisher-auth-sandbox.chillsabo1125.workers.dev/tiktok/health`
 
 ## 置換が必要な箇所
 
@@ -66,3 +72,5 @@ TikTok Developers 申請用の最小公開セットです。
 - Direct Post 審査では `creator_info/query` を使って privacy / interaction / duration を creator に見せる
 - Direct Post を有効化する時は Worker の scope を `user.info.basic,video.upload,video.publish` に広げる
 - `PULL_FROM_URL` で使う動画URLは、自分が所有・検証できる domain か URL prefix に寄せる
+- Sandbox で Direct Post を試す時は `workspace.html?mode=sandbox` を使う
+- Cloudflare Worker の sandbox 環境は `npm run deploy:sandbox` で deploy する

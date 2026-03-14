@@ -11,3 +11,13 @@ TIKTOK_REDIRECT_URI = "https://tiktok-short-video-publisher-auth.chillsabo1125.w
 TIKTOK_SCOPE = "user.info.basic,video.upload"
 ALLOWED_ORIGIN = "https://1125haruki.github.io"
 APP_RETURN_URL = "https://1125haruki.github.io/tiktok-short-video-publisher-site/workspace.html"
+
+[env.sandbox]
+name = "tiktok-short-video-publisher-auth-sandbox"
+workers_dev = true
+
+[env.sandbox.vars]
+TIKTOK_REDIRECT_URI = "https://tiktok-short-video-publisher-auth-sandbox.chillsabo1125.workers.dev/tiktok/callback"
+TIKTOK_SCOPE = "user.info.basic,video.upload,video.publish"
+ALLOWED_ORIGIN = "https://1125haruki.github.io"
+APP_RETURN_URL = "https://1125haruki.github.io/tiktok-short-video-publisher-site/workspace.html?mode=sandbox"
