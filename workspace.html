@@ -676,7 +676,7 @@
       videoUrlInput.value = sampleVideoUrl;
       postTitleInput.value = "AI cat daily story | episode 1";
       internalNoteInput.value = "Direct Post review mode is prepared while Upload API remains available.";
-      connectButton.href = `${workerBase}/tiktok/connect`;
+      connectButton.href = `${workerBase}/tiktok/connect?return_url=${encodeURIComponent(window.location.href)}`;
 
       function persistClientSession(clientSession) {
         state.clientSession = clientSession;

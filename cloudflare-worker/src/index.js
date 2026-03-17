@@ -338,6 +338,7 @@ async function fetchPublishStatus(accessToken, publishId) {
 }
 
 async function handleConnect(request, env) {
+  const url = new URL(request.url);
   const stateBundle = await createStateBundle(env.STATE_SECRET);
   const params = new URLSearchParams({
     client_key: env.TIKTOK_CLIENT_KEY,
@@ -354,6 +355,10 @@ async function handleConnect(request, env) {
     },
   });
   response.headers.append("Set-Cookie", cookie("tt_state_verifier", stateBundle.verifier, 600));
+  const returnUrl = normalizeReturnUrl(url.searchParams.get("return_url"), env);
+  if (returnUrl) {
+    response.headers.append("Set-Cookie", cookie("tt_app_return_url", returnUrl, 600));
+  }
   return response;
 }
 
@@ -387,6 +392,17 @@ function computeExpiryIso(expiresIn) {
   return new Date(Date.now() + seconds * 1000).toISOString();
 }
 
+function normalizeReturnUrl(returnUrl, env) {
+  if (!returnUrl) return "";
+  try {
+    const parsed = new URL(returnUrl);
+    if (parsed.origin !== (env.ALLOWED_ORIGIN || "")) return "";
+    return parsed.toString();
+  } catch (_error) {
+    return "";
+  }
+}
+
 async function forwardTokenBundle(bundle, env) {
   if (!env.TOKEN_SINK_URL) return null;
   const response = await fetch(env.TOKEN_SINK_URL, {
@@ -410,10 +426,14 @@ async function forwardTokenBundle(bundle, env) {
   return { ok: true, status: response.status };
 }
 
-function buildReturnUrl(env, tokenBundle) {
-  const baseReturnUrl = env.APP_RETURN_URL
-    ? `${env.APP_RETURN_URL}${env.APP_RETURN_URL.includes("?") ? "&" : "?"}connected=1`
-    : env.ALLOWED_ORIGIN || "/";
+function buildReturnUrl(env, tokenBundle, request) {
+  const cookies = parseCookies(request);
+  const requestedReturnUrl = normalizeReturnUrl(cookies.tt_app_return_url || "", env);
+  const baseReturnUrl =
+    requestedReturnUrl ||
+    (env.APP_RETURN_URL
+      ? `${env.APP_RETURN_URL}${env.APP_RETURN_URL.includes("?") ? "&" : "?"}connected=1`
+      : env.ALLOWED_ORIGIN || "/");
 
   if (env.CLIENT_SESSION_BRIDGE !== "fragment") {
     return baseReturnUrl;
@@ -460,7 +480,7 @@ async function handleCallback(request, env) {
     if (env.TOKEN_SINK_URL) {
       sinkResult = await forwardTokenBundle(tokenBundle, env);
     }
-    const returnUrl = buildReturnUrl(env, tokenBundle);
+    const returnUrl = buildReturnUrl(env, tokenBundle, request);
 
     const response = html(
       `<h1>TikTok authorization succeeded</h1>
@@ -479,6 +499,7 @@ async function handleCallback(request, env) {
       }
     );
     response.headers.append("Set-Cookie", clearCookie("tt_state_verifier"));
+    response.headers.append("Set-Cookie", clearCookie("tt_app_return_url"));
     response.headers.append(
       "Set-Cookie",
       cookie("tt_access_token", tokenBundle.access_token, tokenBundle.expires_in || 86400)
