@@ -15,6 +15,8 @@ TikTok OAuth v2 の最小 Worker です。
   - 必要なら token を外部 sink に転送
 - `/tiktok/session`
   - 現在の creator session を返す
+- `/tiktok/session/export`
+  - browser の接続済み cookie session から automation bundle を書き出す
 - `/tiktok/creator-info`
   - `video.publish` がある時だけ creator posting settings を返す
 - `/tiktok/direct-post`
@@ -49,9 +51,10 @@ TikTok OAuth v2 の最小 Worker です。
 ## 運用メモ
 
 - live の Upload API だけなら `TIKTOK_SCOPE=user.info.basic,video.upload`
-- Direct Post 審査を進める時は `TIKTOK_SCOPE=user.info.basic,video.upload,video.publish`
+- Direct Post 承認後の production は `TIKTOK_SCOPE=user.info.basic,video.upload,video.publish`
 - `TOKEN_SINK_URL` が未設定でも接続確認はできます
 - 本番では token の保存先を必ず決めてください
 - 現在の Worker URL は `https://tiktok-short-video-publisher-auth.chillsabo1125.workers.dev`
 - sandbox 用の Worker URL は `https://tiktok-short-video-publisher-auth-sandbox.chillsabo1125.workers.dev`
 - sandbox 環境の deploy は `npm run deploy:sandbox`
+- `session/export` は local automation bundle 生成用です。ダウンロードした JSON は機密情報として扱ってください

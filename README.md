@@ -35,6 +35,8 @@ TikTok Developers 申請用の最小公開セットです。
   - `https://1125haruki.github.io/tiktok-short-video-publisher-site/tour.html`
 - `Publisher Workspace`
   - `https://1125haruki.github.io/tiktok-short-video-publisher-site/workspace.html`
+- `Automation Workspace`
+  - `https://1125haruki.github.io/tiktok-short-video-publisher-site/workspace.html?automation=1`
 - `Sandbox Workspace`
   - `https://1125haruki.github.io/tiktok-short-video-publisher-site/workspace.html?mode=sandbox`
 - `Help Center`
@@ -70,7 +72,9 @@ TikTok Developers 申請用の最小公開セットです。
 - live な TikTok 認可導線は `workspace.html` のような separate app page に分ける
 - workflow 動画と product walkthrough は `tour.html` にまとめる
 - Direct Post 審査では `creator_info/query` を使って privacy / interaction / duration を creator に見せる
-- Direct Post を有効化する時は Worker の scope を `user.info.basic,video.upload,video.publish` に広げる
+- production app 承認後は Worker の scope を `user.info.basic,video.upload,video.publish` にする
 - `PULL_FROM_URL` で使う動画URLは、自分が所有・検証できる domain か URL prefix に寄せる
 - Sandbox で Direct Post を試す時は `workspace.html?mode=sandbox` を使う
 - Cloudflare Worker の sandbox 環境は `npm run deploy:sandbox` で deploy する
+- local 自動投稿は `automation/README.md` を入口にし、公開審査導線とは分けて運用する
+- 緊急時の復旧用 snapshot は `archive/approved_production_20260317/` に残してある

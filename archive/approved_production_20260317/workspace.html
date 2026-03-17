@@ -370,7 +370,6 @@
         <div class="actions">
           <a class="button-link button-primary" id="connectButton" href="#">Connect TikTok</a>
           <button class="button-secondary" id="refreshSessionButton" type="button">Refresh Creator Session</button>
-          <button class="button-secondary" id="exportSessionButton" type="button" hidden>Download Automation Bundle</button>
           <button class="button-secondary" id="loadCreatorInfoButton" type="button">Load Creator Posting Settings</button>
           <a class="button-link button-warm" href="./tour.html">View Product Tour</a>
         </div>
@@ -599,7 +598,6 @@
     <script>
       const urlParams = new URLSearchParams(window.location.search);
       const workspaceMode = urlParams.get("mode") === "sandbox" ? "sandbox" : "production";
-      const automationMode = urlParams.get("automation") === "1";
       const workerConfig =
         workspaceMode === "sandbox"
           ? {
@@ -627,7 +625,6 @@
 
       const connectButton = document.getElementById("connectButton");
       const refreshSessionButton = document.getElementById("refreshSessionButton");
-      const exportSessionButton = document.getElementById("exportSessionButton");
       const loadCreatorInfoButton = document.getElementById("loadCreatorInfoButton");
       const directPostButton = document.getElementById("directPostButton");
       const uploadDraftButton = document.getElementById("uploadDraftButton");
@@ -725,12 +722,6 @@
 
       function hasScope(scopeText, scopeName) {
         return parseScopes(scopeText).includes(scopeName);
-      }
-
-      function redactToken(token) {
-        if (!token) return "";
-        if (token.length <= 12) return "*".repeat(token.length);
-        return `${token.slice(0, 6)}...${token.slice(-4)}`;
       }
 
       function formatPrivacyOption(option) {
@@ -897,8 +888,6 @@
         loadCreatorInfoButton.disabled = !sessionHasDirectPost;
         directPostButton.disabled = !sessionHasDirectPost;
         uploadDraftButton.disabled = !sessionHasUpload;
-        exportSessionButton.hidden = !(automationMode && workspaceMode === "production");
-        exportSessionButton.disabled = !state.sessionScope;
       }
 
       async function callJson(path, options = {}) {
@@ -985,51 +974,6 @@
           clearCreatorSettings();
           showJson({ error: String(error.message || error), details: error.payload || null });
           setStatus(`Failed to load creator settings: ${error.message || error}`, true);
-        }
-      }
-
-      async function exportAutomationBundle() {
-        setStatus("Downloading the automation bundle for local posting.");
-        try {
-          const response = await fetch(`${workerBase}/tiktok/session/export`, {
-            credentials: "include",
-          });
-          const data = await response.json().catch(() => ({}));
-          if (!response.ok) {
-            const error = new Error(data.message || data.error || `HTTP ${response.status}`);
-            error.payload = data;
-            throw error;
-          }
-
-          const filename = `tiktok_creator_session_${workspaceMode}.json`;
-          const blob = new Blob([JSON.stringify(data, null, 2) + "\n"], {
-            type: "application/json;charset=utf-8",
-          });
-          const href = URL.createObjectURL(blob);
-          const anchor = document.createElement("a");
-          anchor.href = href;
-          anchor.download = filename;
-          document.body.appendChild(anchor);
-          anchor.click();
-          anchor.remove();
-          URL.revokeObjectURL(href);
-
-          showJson({
-            ok: true,
-            exportedAt: data.exportedAt || "",
-            workerBase: data.workerBase || workerBase,
-            scope: data.scope || "",
-            openId: data.openId || "",
-            accessToken: redactToken(data.accessToken || ""),
-            refreshToken: redactToken(data.refreshToken || ""),
-            accessTokenExpiresAt: data.accessTokenExpiresAt || "",
-            refreshTokenExpiresAt: data.refreshTokenExpiresAt || "",
-            fileName: filename,
-          });
-          setStatus("Automation bundle downloaded. Keep the JSON private and use it for local posting.");
-        } catch (error) {
-          showJson({ error: String(error.message || error), details: error.payload || null });
-          setStatus(`Failed to export automation bundle: ${error.message || error}`, true);
         }
       }
 
@@ -1176,7 +1120,6 @@
       });
 
       refreshSessionButton.addEventListener("click", refreshSession);
-      exportSessionButton.addEventListener("click", exportAutomationBundle);
       loadCreatorInfoButton.addEventListener("click", loadCreatorInfo);
       directPostButton.addEventListener("click", directPost);
       uploadDraftButton.addEventListener("click", uploadDraft);

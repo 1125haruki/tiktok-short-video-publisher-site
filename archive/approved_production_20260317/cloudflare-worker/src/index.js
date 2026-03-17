@@ -140,20 +140,6 @@ function parseHeaderSession(request) {
   };
 }
 
-function parseCookieSession(request) {
-  const cookies = parseCookies(request);
-  if (!cookies.tt_access_token) return null;
-  return {
-    accessToken: cookies.tt_access_token,
-    refreshToken: cookies.tt_refresh_token || "",
-    scope: cookies.tt_scope || "",
-    openId: cookies.tt_open_id || "",
-    accessTokenExpiresAt: cookies.tt_access_expires_at || "",
-    refreshTokenExpiresAt: cookies.tt_refresh_expires_at || "",
-    source: "cookie",
-  };
-}
-
 function createTikTokError(payload, fallback, status = 400) {
   const err = new Error(
     payload?.error?.message ||
@@ -179,8 +165,8 @@ function requireAccessToken(request, env) {
     return { ok: true, session: headerSession };
   }
 
-  const cookieSession = parseCookieSession(request);
-  if (!cookieSession?.accessToken) {
+  const cookies = parseCookies(request);
+  if (!cookies.tt_access_token) {
     return {
       ok: false,
       response: withCors(
@@ -190,7 +176,15 @@ function requireAccessToken(request, env) {
       ),
     };
   }
-  return { ok: true, session: cookieSession };
+  return {
+    ok: true,
+    session: {
+      accessToken: cookies.tt_access_token,
+      scope: cookies.tt_scope || "",
+      openId: cookies.tt_open_id || "",
+      source: "cookie",
+    },
+  };
 }
 
 function requireScope(request, env, session, scope) {
@@ -208,27 +202,6 @@ function requireScope(request, env, session, scope) {
           message: `Reconnect TikTok with the ${scope} scope before using this action.`,
           requiredScope: scope,
           currentScope: parseScopeList(session.scope || ""),
-        },
-        { status: 403 }
-      )
-    ),
-  };
-}
-
-function requireAllowedOrigin(request, env) {
-  const origin = request.headers.get("Origin") || "";
-  if (origin && origin === (env.ALLOWED_ORIGIN || "")) {
-    return { ok: true };
-  }
-  return {
-    ok: false,
-    response: withCors(
-      request,
-      env,
-      json(
-        {
-          error: "forbidden_origin",
-          message: "This endpoint is only available from the configured website origin.",
         },
         { status: 403 }
       )
@@ -381,12 +354,6 @@ async function exchangeToken(code, env) {
   return payload;
 }
 
-function computeExpiryIso(expiresIn) {
-  const seconds = Number(expiresIn);
-  if (!Number.isFinite(seconds) || seconds <= 0) return "";
-  return new Date(Date.now() + seconds * 1000).toISOString();
-}
-
 async function forwardTokenBundle(bundle, env) {
   if (!env.TOKEN_SINK_URL) return null;
   const response = await fetch(env.TOKEN_SINK_URL, {
@@ -499,22 +466,6 @@ async function handleCallback(request, env) {
       "Set-Cookie",
       cookie("tt_scope", tokenBundle.scope || "", tokenBundle.expires_in || 86400)
     );
-    response.headers.append(
-      "Set-Cookie",
-      cookie(
-        "tt_access_expires_at",
-        computeExpiryIso(tokenBundle.expires_in),
-        tokenBundle.expires_in || 86400
-      )
-    );
-    response.headers.append(
-      "Set-Cookie",
-      cookie(
-        "tt_refresh_expires_at",
-        computeExpiryIso(tokenBundle.refresh_expires_in),
-        tokenBundle.refresh_expires_in || 86400 * 30
-      )
-    );
     return response;
   } catch (err) {
     return html(`<h1>Token exchange failed</h1><p>${String(err.message || err)}</p>`, {
@@ -563,41 +514,8 @@ async function handleSession(request, env) {
     response.headers.append("Set-Cookie", clearCookie("tt_refresh_token"));
     response.headers.append("Set-Cookie", clearCookie("tt_open_id"));
     response.headers.append("Set-Cookie", clearCookie("tt_scope"));
-    response.headers.append("Set-Cookie", clearCookie("tt_access_expires_at"));
-    response.headers.append("Set-Cookie", clearCookie("tt_refresh_expires_at"));
     return response;
   }
-}
-
-async function handleSessionExport(request, env) {
-  const originCheck = requireAllowedOrigin(request, env);
-  if (!originCheck.ok) return originCheck.response;
-
-  const session = parseCookieSession(request);
-  if (!session?.accessToken) {
-    return withCors(
-      request,
-      env,
-      json({ error: "not_connected", message: "Connect TikTok first." }, { status: 401 })
-    );
-  }
-
-  return withCors(
-    request,
-    env,
-    json({
-      connected: true,
-      exportedAt: new Date().toISOString(),
-      workerBase: new URL(request.url).origin,
-      accessToken: session.accessToken,
-      refreshToken: session.refreshToken,
-      scope: session.scope || "",
-      openId: session.openId || "",
-      accessTokenExpiresAt: session.accessTokenExpiresAt || "",
-      refreshTokenExpiresAt: session.refreshTokenExpiresAt || "",
-      source: session.source || "cookie",
-    })
-  );
 }
 
 async function handleCreatorInfo(request, env) {
@@ -807,10 +725,6 @@ export default {
 
       if (url.pathname === "/tiktok/session") {
         return handleSession(request, env);
-      }
-
-      if (url.pathname === "/tiktok/session/export") {
-        return handleSessionExport(request, env);
       }
 
       if (url.pathname === "/tiktok/creator-info" && request.method === "POST") {
