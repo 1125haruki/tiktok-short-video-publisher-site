@@ -434,18 +434,21 @@
                     <input id="allowComment" type="checkbox" />
                     <span>Allow comments</span>
                   </label>
+                  <div class="field-hint" id="commentConstraint" style="display: none; color: #d93025;"></div>
                 </div>
                 <div class="toggle-card">
                   <label class="checkline">
                     <input id="allowDuet" type="checkbox" />
                     <span>Allow duets</span>
                   </label>
+                  <div class="field-hint" id="duetConstraint" style="display: none; color: #d93025;"></div>
                 </div>
                 <div class="toggle-card">
                   <label class="checkline">
                     <input id="allowStitch" type="checkbox" />
                     <span>Allow stitches</span>
                   </label>
+                  <div class="field-hint" id="stitchConstraint" style="display: none; color: #d93025;"></div>
                 </div>
                 <div class="toggle-card">
                   <label class="checkline">
@@ -653,6 +656,9 @@
       const brandDisclosureLabel = document.getElementById("brandDisclosureLabel");
       const brandPrivacyWarning = document.getElementById("brandPrivacyWarning");
       const consentText = document.getElementById("consentText");
+      const commentConstraint = document.getElementById("commentConstraint");
+      const duetConstraint = document.getElementById("duetConstraint");
+      const stitchConstraint = document.getElementById("stitchConstraint");
 
       const statusLine = document.getElementById("statusLine");
       const jsonOutput = document.getElementById("jsonOutput");
@@ -848,8 +854,68 @@
 
         privacyHintEl.textContent =
           "Privacy options are loaded from TikTok and remain unselected until the creator chooses one.";
+
+        // Point 1: Check if creator can post
+        if (data?.privacy_level_options?.length === 0) {
+          directPostButton.disabled = true;
+          setStatus("This creator cannot make more posts at this moment. Please try again later.", true);
+        } else {
+          directPostButton.disabled = false;
+        }
+
+        updateInteractionConstraints();
         updateModeUI();
         syncPreview();
+      }
+
+      function updateInteractionConstraints() {
+        const privacyLevel = privacyLevelSelect.value;
+        const ci = state.creatorInfo;
+
+        // Reset to creator_info baseline
+        const commentDisabledByCreator = Boolean(ci?.comment_disabled);
+        const duetDisabledByCreator = Boolean(ci?.duet_disabled);
+        const stitchDisabledByCreator = Boolean(ci?.stitch_disabled);
+
+        // Privacy-based constraints: SELF_ONLY disables duet and stitch
+        const isPrivate = privacyLevel === "SELF_ONLY";
+
+        // Comment
+        if (commentDisabledByCreator) {
+          allowCommentInput.disabled = true;
+          allowCommentInput.checked = false;
+          commentConstraint.textContent = "Comments are unavailable for this creator.";
+          commentConstraint.style.display = "";
+        } else {
+          allowCommentInput.disabled = false;
+          commentConstraint.style.display = "none";
+        }
+
+        // Duet
+        if (isPrivate || duetDisabledByCreator) {
+          allowDuetInput.disabled = true;
+          allowDuetInput.checked = false;
+          duetConstraint.textContent = isPrivate
+            ? "Duets are not available for private videos."
+            : "Duets are unavailable for this creator.";
+          duetConstraint.style.display = "";
+        } else {
+          allowDuetInput.disabled = false;
+          duetConstraint.style.display = "none";
+        }
+
+        // Stitch
+        if (isPrivate || stitchDisabledByCreator) {
+          allowStitchInput.disabled = true;
+          allowStitchInput.checked = false;
+          stitchConstraint.textContent = isPrivate
+            ? "Stitches are not available for private videos."
+            : "Stitches are unavailable for this creator.";
+          stitchConstraint.style.display = "";
+        } else {
+          allowStitchInput.disabled = false;
+          stitchConstraint.style.display = "none";
+        }
       }
 
       function updateModeUI() {
@@ -1109,10 +1175,39 @@
               effectiveDurationSec: getEffectiveDurationSec(),
             },
           });
-          setStatus("Direct Post request created. Use publish status to track progress.");
+          setStatus("Your video is being processed. It may take a few minutes before it appears on the creator's profile.");
+          if (data.publishId) {
+            pollPublishStatus(data.publishId);
+          }
         } catch (error) {
           showJson({ error: String(error.message || error), details: error.payload || null });
           setStatus(`Direct Post failed: ${error.message || error}`, true);
+        }
+      }
+
+      async function pollPublishStatus(publishId, attempt = 1, maxAttempts = 5) {
+        if (attempt > maxAttempts) {
+          setStatus("Processing is taking longer than expected. Use 'Check Publish Status' to check manually.");
+          return;
+        }
+        const delay = attempt <= 2 ? 5000 : 10000;
+        await new Promise((r) => setTimeout(r, delay));
+        try {
+          const data = await callJson(`/tiktok/status?publish_id=${encodeURIComponent(publishId)}`);
+          showJson(data);
+          const status = data?.status || data?.data?.status;
+          if (status === "PUBLISH_COMPLETE") {
+            setStatus("Video published successfully on TikTok.");
+            return;
+          }
+          if (status === "FAILED") {
+            setStatus("Video publishing failed. Check the response for details.", true);
+            return;
+          }
+          setStatus(`Processing video (attempt ${attempt}/${maxAttempts})... Status: ${status || "pending"}`);
+          pollPublishStatus(publishId, attempt + 1, maxAttempts);
+        } catch (error) {
+          setStatus(`Status check failed: ${error.message || error}. Use 'Check Publish Status' to retry.`, true);
         }
       }
 
@@ -1237,7 +1332,7 @@
       videoUrlInput.addEventListener("input", syncPreview);
       postTitleInput.addEventListener("input", syncPreview);
       internalNoteInput.addEventListener("input", syncPreview);
-      privacyLevelSelect.addEventListener("change", () => { syncPreview(); updateBrandDisclosure(); });
+      privacyLevelSelect.addEventListener("change", () => { syncPreview(); updateBrandDisclosure(); updateInteractionConstraints(); });
       manualDurationInput.addEventListener("input", updateModeUI);
       brandOrganicToggleInput.addEventListener("change", updateBrandDisclosure);
       brandContentToggleInput.addEventListener("change", () => { updateModeUI(); updateBrandDisclosure(); });
