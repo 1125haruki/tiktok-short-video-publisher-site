@@ -470,6 +470,9 @@
                 </div>
               </div>
 
+              <div id="brandDisclosureLabel" class="inline-note" style="display: none; font-weight: 600;"></div>
+              <div id="brandPrivacyWarning" class="inline-note" style="display: none; color: #d93025;"></div>
+
               <div class="inline-note">
                 Direct Post review should keep creator choices explicit. Comments, duets, and stitches stay off until
                 the creator enables them here.
@@ -477,7 +480,7 @@
 
               <label class="checkline">
                 <input id="consentCheckbox" type="checkbox" />
-                <span
+                <span id="consentText"
                   >I confirm this creator is authorized to publish this video, I reviewed the TikTok posting settings,
                   and I accept the
                   <a href="https://developers.tiktok.com/doc/content-sharing-guidelines/" target="_blank" rel="noreferrer"
@@ -647,6 +650,9 @@
       const brandContentToggleInput = document.getElementById("brandContentToggle");
       const consentCheckbox = document.getElementById("consentCheckbox");
       const publishIdInput = document.getElementById("publishId");
+      const brandDisclosureLabel = document.getElementById("brandDisclosureLabel");
+      const brandPrivacyWarning = document.getElementById("brandPrivacyWarning");
+      const consentText = document.getElementById("consentText");
 
       const statusLine = document.getElementById("statusLine");
       const jsonOutput = document.getElementById("jsonOutput");
@@ -1182,12 +1188,59 @@
       uploadDraftButton.addEventListener("click", uploadDraft);
       checkStatusButton.addEventListener("click", checkStatus);
 
+      function updateBrandDisclosure() {
+        const isOrganic = brandOrganicToggleInput.checked;
+        const isBranded = brandContentToggleInput.checked;
+        const privacyLevel = privacyLevelSelect.value;
+
+        // Disclosure label per Content Sharing Guidelines
+        if (isBranded) {
+          brandDisclosureLabel.textContent = "Your video will be labeled as 'Paid partnership'";
+          brandDisclosureLabel.style.display = "";
+        } else if (isOrganic) {
+          brandDisclosureLabel.textContent = "Your video will be labeled as 'Promotional content'";
+          brandDisclosureLabel.style.display = "";
+        } else {
+          brandDisclosureLabel.style.display = "none";
+        }
+
+        // Branded content + SELF_ONLY constraint
+        if (privacyLevel === "SELF_ONLY") {
+          brandContentToggleInput.disabled = true;
+          if (brandContentToggleInput.checked) {
+            brandContentToggleInput.checked = false;
+          }
+          brandPrivacyWarning.textContent = "Visibility for branded content can't be private.";
+          brandPrivacyWarning.style.display = "";
+        } else {
+          brandContentToggleInput.disabled = false;
+          brandPrivacyWarning.style.display = "none";
+        }
+
+        // Dynamic consent text per Content Sharing Guidelines
+        const guidelinesLink = '<a href="https://developers.tiktok.com/doc/content-sharing-guidelines/" target="_blank" rel="noreferrer">Content Sharing Guidelines</a>';
+        const musicLink = '<a href="https://www.tiktok.com/legal/page/global/music-usage-confirmation/en" target="_blank" rel="noreferrer">Music Usage Confirmation</a>';
+        const brandedPolicyLink = '<a href="https://www.tiktok.com/legal/page/global/bc-policy/en" target="_blank" rel="noreferrer">Branded Content Policy</a>';
+
+        const base = "I confirm this creator is authorized to publish this video, I reviewed the TikTok posting settings, and I accept the " + guidelinesLink;
+
+        if (isBranded) {
+          consentText.innerHTML = base + " plus the " + brandedPolicyLink + " and " + musicLink + ".";
+        } else {
+          consentText.innerHTML = base + " plus the " + musicLink + ".";
+        }
+
+        // Uncheck consent when disclosure state changes to force re-confirmation
+        consentCheckbox.checked = false;
+      }
+
       videoUrlInput.addEventListener("input", syncPreview);
       postTitleInput.addEventListener("input", syncPreview);
       internalNoteInput.addEventListener("input", syncPreview);
-      privacyLevelSelect.addEventListener("change", syncPreview);
+      privacyLevelSelect.addEventListener("change", () => { syncPreview(); updateBrandDisclosure(); });
       manualDurationInput.addEventListener("input", updateModeUI);
-      brandContentToggleInput.addEventListener("change", updateModeUI);
+      brandOrganicToggleInput.addEventListener("change", updateBrandDisclosure);
+      brandContentToggleInput.addEventListener("change", () => { updateModeUI(); updateBrandDisclosure(); });
 
       clearCreatorSettings();
       syncPreview();
